@@ -1,13 +1,15 @@
-/* n8n Landingpage - Neon Dark Mode Style */
+/* n8n Landingpage - Neon Dark/Light Mode Style */
 
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Dark Mode (Default) */
 body {
-  background: #111;
+  background: #000;
   color: #fff;
   font-family: 'Orbitron', Arial, sans-serif;
   margin: 0;
@@ -16,15 +18,83 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  animation: bg-flicker 10s infinite alternate;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-@keyframes bg-flicker {
-  0% { background: #111; }
+body.dark-mode {
+  background: #000;
+  color: #fff;
+  animation: bg-flicker-dark 10s infinite alternate;
+}
+
+body.light-mode {
+  background: #ffffff;
+  color: #000;
+  animation: bg-flicker-light 10s infinite alternate;
+}
+
+/* Background animations */
+@keyframes bg-flicker-dark {
+  0% { background: #000; }
   50% { background: #1a0033; }
-  100% { background: #111; }
+  100% { background: #000; }
 }
 
+@keyframes bg-flicker-light {
+  0% { background: #ffffff; }
+  50% { background: #f0f0ff; }
+  100% { background: #ffffff; }
+}
+
+/* Theme Toggle Button */
+.theme-toggle-wrapper {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.theme-toggle-btn {
+  background: rgba(57, 255, 20, 0.2);
+  border: 2px solid #39ff14;
+  color: #39ff14;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(57, 255, 20, 0.3);
+  box-shadow: 0 0 15px #39ff14, 0 0 30px #39ff14, 0 0 45px #39ff14;
+  transform: scale(1.05);
+}
+
+.toggle-icon {
+  font-size: 18px;
+}
+
+/* Light mode toggle button styling */
+body.light-mode .theme-toggle-btn {
+  background: rgba(255, 20, 147, 0.2);
+  border: 2px solid #ff1493;
+  color: #ff1493;
+  box-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493;
+}
+
+body.light-mode .theme-toggle-btn:hover {
+  background: rgba(255, 20, 147, 0.3);
+  box-shadow: 0 0 15px #ff1493, 0 0 30px #ff1493, 0 0 45px #ff1493;
+}
+
+/* Headings - Dark Mode */
 h1, h2, h3 {
   color: #39ff14;
   text-shadow:
@@ -34,144 +104,200 @@ h1, h2, h3 {
     0 0 40px #00ffd0;
   margin-bottom: 20px;
   text-align: center;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-h1 {
-  font-size: 2.5em;
-  margin-bottom: 10px;
+/* Headings - Light Mode */
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3 {
+  color: #ff1493;
+  text-shadow:
+    0 0 8px #ff1493,
+    0 0 16px #ff1493,
+    0 0 24px #ff1493,
+    0 0 32px #ff69b4;
 }
 
-h2 {
-  font-size: 1.8em;
-  margin-bottom: 30px;
-}
-
+/* Navigation */
 nav {
+  background: rgba(0, 255, 255, 0.1);
+  padding: 15px;
+  width: 100%;
   text-align: center;
-  margin-bottom: 30px;
+  box-shadow: 0 0 15px #00ffd0;
+  transition: all 0.3s ease;
+}
+
+body.light-mode nav {
+  background: rgba(255, 20, 147, 0.1);
+  box-shadow: 0 0 15px #ff1493;
 }
 
 nav a {
-  color: #00f0ff;
-  margin: 0 15px;
+  color: #00ffd0;
   text-decoration: none;
-  font-size: 1.1em;
-  text-shadow: 0 0 10px #00f0ff, 0 0 20px #0099ff;
-  transition: color 0.2s, text-shadow 0.3s;
-  display: inline-block;
+  margin: 0 15px;
+  font-weight: bold;
+  text-shadow: 0 0 5px #00ffd0;
+  transition: all 0.3s ease;
+}
+
+body.light-mode nav a {
+  color: #ff1493;
+  text-shadow: 0 0 5px #ff1493;
 }
 
 nav a:hover {
-  color: #ff00de;
-  text-shadow: 0 0 20px #ff00de, 0 0 30px #ff00de;
+  text-shadow: 0 0 10px #00ffd0, 0 0 20px #00ffd0;
 }
 
+body.light-mode nav a:hover {
+  text-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493;
+}
+
+/* Container */
 .container {
-  border: 2px solid #39ff14;
-  box-shadow: 0 0 30px #00ffd0 inset, 0 0 16px #00f0ff;
-  padding: 30px 40px;
-  border-radius: 16px;
-  background: rgba(40, 10, 80, 0.8);
-  margin-top: 40px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 30px #39ff14, 0 0 60px #00ffd0;
   max-width: 600px;
   width: 90%;
-  animation: neon-glow 2s infinite alternate;
+  margin: 20px;
+  transition: all 0.3s ease;
 }
 
-@keyframes neon-glow {
-  from { box-shadow: 0 0 30px #00ffd0 inset, 0 0 16px #00f0ff; }
-  to { box-shadow: 0 0 45px #ff00de, 0 0 32px #ff00de; }
+body.light-mode .container {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 30px #ff1493, 0 0 60px #ff69b4;
 }
 
-form {
-  margin-top: 20px;
-}
-
+/* Form Elements */
 label {
-  font-size: 1.1em;
-  margin: 10px 0 5px 0;
-  color: #fff;
   display: block;
-  text-shadow: 0 0 5px #39ff14;
-}
-
-input, textarea {
-  font-size: 1.1em;
-  margin: 10px 0;
+  margin-top: 15px;
   color: #39ff14;
-  display: block;
-  background: #222;
-  border: 1.5px solid #39ff14;
-  border-radius: 8px;
-  padding: 8px 12px;
-  width: 100%;
-  transition: border 0.2s, box-shadow 0.3s;
-  outline: none;
-  box-shadow: 0 0 10px #39ff1480;
-  font-family: 'Orbitron', Arial, sans-serif;
-}
-
-input:focus, textarea:focus {
-  border: 2px solid #ff00de;
-  box-shadow: 0 0 20px #ff00de80;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-button {
-  background: linear-gradient(90deg, #39ff14, #00ffd0, #ff00de);
-  color: #111;
-  border: none;
-  padding: 12px 26px;
-  border-radius: 8px;
   font-weight: bold;
-  font-size: 1.15em;
-  margin-top: 18px;
-  cursor: pointer;
-  box-shadow: 0 0 10px #39ff14, 0 0 20px #ff00de;
-  animation: button-fade 2s infinite alternate;
-  width: 100%;
-  font-family: 'Orbitron', Arial, sans-serif;
-  transition: transform 0.2s;
+  text-shadow: 0 0 5px #39ff14;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-button:hover {
+body.light-mode label {
+  color: #ff1493;
+  text-shadow: 0 0 5px #ff1493;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border: 2px solid #39ff14;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #39ff14;
+  font-family: 'Orbitron', Arial, sans-serif;
+  box-shadow: 0 0 10px #39ff14;
+  transition: all 0.3s ease;
+}
+
+body.light-mode input,
+body.light-mode textarea {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #ff1493;
+  color: #ff1493;
+  box-shadow: 0 0 10px #ff1493;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 15px #39ff14, 0 0 30px #00ffd0;
+  border-color: #00ffd0;
+}
+
+body.light-mode input:focus,
+body.light-mode textarea:focus {
+  box-shadow: 0 0 15px #ff1493, 0 0 30px #ff69b4;
+  border-color: #ff69b4;
+}
+
+/* Button */
+button[type="submit"] {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: linear-gradient(90deg, #39ff14, #00ffd0);
+  color: #000;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 0 20px #39ff14;
+  font-family: 'Orbitron', Arial, sans-serif;
+  transition: all 0.3s ease;
+}
+
+body.light-mode button[type="submit"] {
+  background: linear-gradient(90deg, #ff1493, #ff69b4);
+  color: #fff;
+  box-shadow: 0 0 20px #ff1493;
+}
+
+button[type="submit"]:hover {
+  box-shadow: 0 0 30px #39ff14, 0 0 60px #00ffd0;
   transform: scale(1.05);
 }
 
-@keyframes button-fade {
-  0% { box-shadow: 0 0 10px #39ff14, 0 0 20px #ff00de; }
-  100% { box-shadow: 0 0 30px #00ffd0, 0 0 24px #ff00de; }
+body.light-mode button[type="submit"]:hover {
+  box-shadow: 0 0 30px #ff1493, 0 0 60px #ff69b4;
 }
 
+/* Response Message */
 #response-message {
   text-align: center;
   font-weight: bold;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 20px;
+  text-shadow: 0 0 10px currentColor;
 }
 
-/* Responsive Design */
+body.light-mode #response-message {
+  color: #ff1493 !important;
+}
+
+/* Animations */
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
+  }
+  50% {
+    text-shadow: 0 0 20px #39ff14, 0 0 40px #00ffd0;
+  }
+}
+
+h1 {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  h1 {
-    font-size: 2em;
-  }
-  
-  h2 {
-    font-size: 1.4em;
-  }
-  
   .container {
     padding: 20px;
-    margin-top: 20px;
+    margin: 10px;
+  }
+  
+  .theme-toggle-wrapper {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .theme-toggle-btn {
+    padding: 10px 16px;
+    font-size: 12px;
   }
   
   nav a {
-    margin: 0 10px;
-    font-size: 1em;
+    margin: 0 8px;
+    font-size: 14px;
   }
 }
