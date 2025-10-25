@@ -1,4 +1,4 @@
-ntwprten # 🌟 n8n Landingpage - Docker Desktop Edition
+# 🌟 n8n Landingpage - Docker Desktop Edition
 
 Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Reverse Proxy und 3D-Flip-Funktion!
 
@@ -19,7 +19,6 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 - **Optimierte Asset-Auslieferung** durch Nginx
 
 ## 📁 Projektstruktur
-
 ```
 landingpage-n8n/
 │
@@ -60,9 +59,52 @@ docker compose up -d
 
 ### Was passiert im Hintergrund?
 1. **Nginx Container** startet auf Port 8080
-2. **n8n Container** startet intern auf Port 5678
+2. **n8n Container** startet intern auf Port 8080 (wurde von 5678 angepasst)
 3. **Nginx** liefert statische Dateien aus und proxied `/n8n/` zu n8n
 4. **Landing Page** lädt mit funktionierendem iframe zu `/n8n/`
+
+## ⚙️ Aktuelle Konfigurationsänderungen
+
+### n8n Umgebungsvariablen (Oktober 2025)
+
+Die folgenden Umgebungsvariablen wurden in `backend/docker-compose.yml` angepasst:
+
+```yaml
+environment:
+  - N8N_HOST=localhost
+  - N8N_PORT=8080                                    # Geändert von 5678 zu 8080
+  - N8N_PROTOCOL=http
+  - WEBHOOK_URL=http://localhost:8080/n8n/
+  - VUE_APP_URL_BASE_API=http://localhost:8080/n8n/ # Neu hinzugefügt
+  - N8N_PATH=/n8n/
+  - N8N_EDITOR_BASE_URL=http://localhost:8080/n8n/
+```
+
+**Wichtige Änderungen:**
+- `N8N_PORT` wurde von `5678` auf `8080` geändert
+- `VUE_APP_URL_BASE_API` wurde hinzugefügt für bessere API-Integration
+- `N8N_HOST` bleibt `localhost`
+- Alle anderen Konfigurationen (nginx.conf, etc.) bleiben unverändert
+
+### ⚠️ Neustart nach Updates erforderlich
+
+Nach einem `git pull` oder Konfigurationsänderungen **MUSS** das System neu gestartet werden:
+
+```bash
+cd backend
+docker compose down
+docker compose up -d
+```
+
+Oder für ein komplettes Rebuild:
+
+```bash
+docker compose down
+docker compose pull
+docker compose up -d --force-recreate
+```
+
+**Hinweis:** Ein einfacher `docker compose restart` reicht NICHT aus, da Umgebungsvariablen nur beim Container-Start geladen werden!
 
 ## 🔧 Container-Details
 
@@ -71,150 +113,86 @@ docker compose up -d
 - **Port**: `8080:80`
 - **Volumes**: 
   - Landing Page Dateien (`index.html`, `assets/`)
-  - Nginx Konfiguration
+  - Nginx Konfiguration (`nginx.conf`)
 
 ### n8n Container
 - **Image**: `n8nio/n8n:latest`
-- **Umgebungsvariablen**:
-  - `N8N_PATH=/n8n/` - Läuft unter Subpath
-  - `WEBHOOK_URL=http://localhost:8080/n8n/`
-- **Persistent Volume**: `n8n-data` für Workflow-Daten
+- **Interner Port**: `8080`
+- **Volume**: `n8n-data` für persistente Workflows
+- **Network**: `landingpage-network` (shared mit nginx)
 
-## 📋 Wichtige Docker Desktop Befehle
+## 📋 Nützliche Docker Compose Befehle
 
-### Container-Status prüfen
+### Container Management
 ```bash
+# Alle Container starten
+docker compose up -d
+
+# Container stoppen
+docker compose down
+
+# Container neu starten (ohne Umgebungsvariablen-Neuladung)
+docker compose restart
+
+# Container neu erstellen (mit Umgebungsvariablen-Neuladung)
+docker compose down && docker compose up -d
+
+# Logs anzeigen
+docker compose logs -f
+
+# Logs nur von n8n
+docker compose logs -f n8n
+
+# Container Status
 docker compose ps
 ```
 
-### Logs anzeigen
+### Volumes & Daten
 ```bash
-# Alle Container
-docker compose logs -f
+# Volumes anzeigen
+docker volume ls
 
-# Nur n8n
-docker compose logs -f n8n
+# n8n Volume inspizieren
+docker volume inspect backend_n8n-data
 
-# Nur Nginx
-docker compose logs -f nginx
-```
-
-### Container stoppen
-```bash
-docker compose down
-```
-
-### Container stoppen + Volumes löschen (⚠️ Löscht n8n Daten!)
-```bash
+# Container mit allen Volumes löschen
 docker compose down -v
 ```
 
-### Container neustarten
+### Updates & Wartung
 ```bash
-docker compose restart
-```
-
-### Images updaten
-```bash
+# Images aktualisieren
 docker compose pull
-docker compose up -d
-```
 
-## 🔧 Konfiguration anpassen
+# Mit neuen Images neu starten
+docker compose up -d --force-recreate
 
-### Port ändern
-In `backend/docker-compose.yml`:
-```yaml
-services:
-  nginx:
-    ports:
-      - "3000:80"  # Ändere 8080 zu gewünschtem Port
-```
-
-### n8n Konfiguration
-In `backend/docker-compose.yml` unter `n8n.environment`:
-```yaml
-environment:
-  - N8N_HOST=localhost
-  - N8N_BASIC_AUTH_ACTIVE=true  # Basis-Authentifizierung aktivieren
-  - N8N_BASIC_AUTH_USER=admin
-  - N8N_BASIC_AUTH_PASSWORD=password
+# Nicht verwendete Images aufräumen
+docker image prune
 ```
 
 ## 🐛 Troubleshooting
 
-### Landing Page lädt nicht
-1. **Docker Desktop läuft?**
-   ```bash
-   docker --version
-   ```
-
-2. **Container Status prüfen**
-   ```bash
-   docker compose ps
-   ```
-
-3. **Port bereits belegt?**
-   - Port in `docker-compose.yml` ändern
-   - Oder anderen Service auf Port 8080 stoppen
-
-### n8n iframe zeigt Fehler
-1. **n8n Container läuft?**
-   ```bash
-   docker compose logs n8n
-   ```
-
-2. **Nginx Proxy Konfiguration prüfen**
-   ```bash
-   docker compose logs nginx
-   ```
-
-3. **Browser Cache leeren**: Strg+Shift+R
-
-### Assets laden nicht
-1. **Nginx Volumes prüfen**
-   ```bash
-   docker compose config
-   ```
-
-2. **File Permissions** (Linux/Mac):
-   ```bash
-   chmod -R 755 assets/
-   ```
-
-### Performance optimieren
-1. **Docker Desktop Ressourcen erhöhen**
-   - Settings > Resources > Advanced
-   - RAM: minimum 4GB empfohlen
-   - CPU: 2+ Cores
-
-## 🔄 Development Workflow
-
-### Änderungen an statischen Dateien
+### Container startet nicht
 ```bash
-# Nach Änderungen an index.html oder assets/:
-docker compose restart nginx
+# Logs prüfen
+docker compose logs
+
+# Container Status
+docker compose ps
+
+# Komplett neu aufbauen
+docker compose down -v
+docker compose up -d
 ```
 
-### Nginx Konfiguration ändern
-```bash
-# Nach Änderungen an nginx.conf:
-docker compose restart nginx
-```
+### n8n nicht erreichbar
+1. Prüfe ob Container läuft: `docker compose ps`
+2. Prüfe nginx logs: `docker compose logs nginx`
+3. Prüfe n8n logs: `docker compose logs n8n`
+4. Teste direkten Zugriff: `curl http://localhost:8080/n8n/`
 
-### n8n Konfiguration ändern
-```bash
-# Nach Änderungen an docker-compose.yml (n8n section):
-docker compose up -d n8n
-```
-
-## 🚨 Docker Desktop für Windows-Nutzer
-
-### WSL2 Backend nutzen
-- Docker Desktop > Settings > General > "Use WSL 2 based engine"
-- Bessere Performance als Hyper-V
-
-### File Watching Issues
+### Windows-spezifische Probleme
 ```bash
 # In WSL2 Terminal, falls Änderungen nicht erkannt werden:
 echo "export DOCKER_BUILDKIT=1" >> ~/.bashrc
@@ -266,7 +244,6 @@ services:
 ## 🌐 Produktions-Deployment
 
 Für Produktionsumgebungen:
-
 ```yaml
 # SSL/TLS mit Traefik oder nginx-proxy
 # Umgebungsvariablen für Secrets
@@ -289,4 +266,4 @@ MIT License - siehe [LICENSE](LICENSE) für Details.
 
 **Mit Docker Desktop wird's einfach! 🐳✨**
 
-Jetzt einfach `docker compose up -d` ausführen und loslegen!prte
+Jetzt einfach `docker compose up -d` ausführen und loslegen!
