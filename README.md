@@ -43,17 +43,19 @@ landingpage-n8n/
 ## 🚀 Installation & Setup
 
 ### 1. Repository klonen
+
 ```bash
 git clone https://github.com/flowgrammer420/landingpage-n8n.git
 cd landingpage-n8n
 ```
 
 ### 2. n8n lokal starten
+
 ```bash
-# Mit Docker
+# Mit Docker (direkt auf Port 5678)
 docker run -d \
   --name n8n \
-  -p 8080:5678 \
+  -p 5678:5678 \
   -v ~/.n8n:/home/node/.n8n \
   n8nio/n8n
 
@@ -63,6 +65,7 @@ n8n start
 ```
 
 ### 3. Landing Page öffnen
+
 ```bash
 # Mit Python Simple HTTP Server
 python3 -m http.server 8000
@@ -73,183 +76,153 @@ npx http-server -p 8000
 
 Öffne im Browser: `http://localhost:8000`
 
+## ⚙️ iframe Konfiguration
+
+Das iframe im Admin-Bereich kann auf zwei Arten konfiguriert werden:
+
+### Option 1: Direkter Zugriff (Standard)
+
+**Aktuell aktiv** - Das iframe zeigt direkt auf die n8n-Instanz:
+
+```html
+<iframe src="http://localhost:5678/" ...>
+```
+
+**Vorteile:**
+- Einfachste Konfiguration
+- Keine zusätzlichen Proxy-Server notwendig
+- Direkte Verbindung zu n8n
+
+**Setup:**
+- n8n muss auf Port 5678 laufen (Standardport)
+- Keine weiteren Konfigurationen notwendig
+
+### Option 2: Via nginx Reverse Proxy
+
+Für produktive Umgebungen oder komplexere Setups:
+
+```html
+<iframe src="http://localhost:8080/n8n/" ...>
+```
+
+**Vorteile:**
+- Mehrere Services über einen Port
+- SSL/TLS-Terminierung möglich
+- Zusätzliche Sicherheitsfeatures
+- URL-Pfad-basiertes Routing
+
+**Anpassung in index.html:**
+
+Ändere die iframe-URL in der Datei `index.html` (Zeile ~63):
+
+```html
+<!-- Für nginx Proxy: -->
+<iframe src="http://localhost:8080/n8n/" 
+        title="n8n Workflow Automation" 
+        id="n8n-iframe"
+        frameborder="0" 
+        allowfullscreen>
+</iframe>
+```
+
 ## 🔧 nginx Reverse Proxy Konfiguration
 
 Für produktive Umgebungen empfehlen wir einen nginx Reverse Proxy:
 
-### nginx Config für Landing Page + n8n iframe
-
 ```nginx
 server {
-    listen 80;
-    server_name ihre-domain.de;
+    listen 8080;
+    server_name localhost;
 
     # Landing Page
     location / {
-        root /var/www/landingpage-n8n;
+        root /pfad/zu/landingpage-n8n;
         index index.html;
         try_files $uri $uri/ =404;
     }
 
-    # n8n Reverse Proxy für iframe
+    # n8n Proxy
     location /n8n/ {
         proxy_pass http://localhost:5678/;
         proxy_http_version 1.1;
-        
-        # WebSocket Support für n8n
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        
-        # Standard Proxy Headers
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         
-        # iframe Header (wichtig!)
+        # Wichtig für iframe Integration
         proxy_hide_header X-Frame-Options;
         add_header X-Frame-Options "SAMEORIGIN";
-        
-        # Timeouts für n8n Workflows
-        proxy_connect_timeout 300;
-        proxy_send_timeout 300;
-        proxy_read_timeout 300;
-    }
-
-    # Optional: Static Assets Caching
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
     }
 }
 ```
 
-### SSL/HTTPS Konfiguration (empfohlen)
-
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name ihre-domain.de;
-
-    # SSL Zertifikate (z.B. Let's Encrypt)
-    ssl_certificate /etc/letsencrypt/live/ihre-domain.de/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ihre-domain.de/privkey.pem;
-
-    # Rest der Konfiguration wie oben...
-}
-
-# HTTP zu HTTPS Redirect
-server {
-    listen 80;
-    server_name ihre-domain.de;
-    return 301 https://$server_name$request_uri;
-}
-```
-
-### nginx Installation & Start
+**nginx starten:**
 
 ```bash
-# nginx installieren
-sudo apt update
-sudo apt install nginx
+# Konfiguration testen
+nginx -t
 
-# Config testen
-sudo nginx -t
-
-# nginx neu laden
-sudo systemctl reload nginx
-
-# Status prüfen
-sudo systemctl status nginx
+# nginx starten/neuladen
+sudo systemctl restart nginx
 ```
 
-## 💡 Verwendung der Flip-Funktion
+## 🎯 Anwendungsfälle
 
-### Zur Admin-Ansicht wechseln
-1. **Klick auf "Admin Bereich"** in der Navigation
-2. Die Seite flippt mit 3D-Animation zur Rückseite
-3. n8n iframe wird angezeigt
+### Entwicklungsumgebung
+- **Empfehlung:** Option 1 (Direkter Zugriff)
+- Schnelles Setup ohne zusätzliche Konfiguration
+- n8n läuft direkt auf Port 5678
 
-### Zurück zur Landing Page
-- **Klick auf "← Zurück"** Button (oben links)
-- **Escape-Taste** drücken (Keyboard-Shortcut)
+### Produktionsumgebung
+- **Empfehlung:** Option 2 (nginx Proxy)
+- Professionelles Setup mit SSL
+- Mehrere Services über einen Port
+- Bessere Kontrolle und Sicherheit
 
-### Technische Details
-```javascript
-// Flip zu Admin
-flipContainer.classList.add('flipped');
+## 🎨 Anpassungen
 
-// Flip zurück zu Landing
-flipContainer.classList.remove('flipped');
-```
+### Theme-Farben ändern
 
-## 🎨 Theme Anpassung
-
-### CSS Variables in `style.css`
+Bearbeite `assets/css/style.css` und passe die CSS-Variablen an:
 
 ```css
-/* Dark Mode (Standard) */
 :root {
-  --bg-color: #0a0e27;
-  --text-color: #39ff14;
-  --neon-glow: #39ff14;
-  --nav-bg: rgba(57, 255, 20, 0.1);
-  /* ... weitere Variablen */
-}
-
-/* Light Mode */
-body.light-mode {
-  --bg-color: #f0f4f8;
-  --text-color: #1a1a2e;
-  --neon-glow: #0066ff;
-  /* ... weitere Variablen */
+    --primary-color: #39ff14;      /* Neon-Grün */
+    --secondary-color: #ff073a;    /* Neon-Rot */
+    --accent-color: #00d4ff;       /* Neon-Blau */
+    /* ... weitere Variablen */
 }
 ```
 
-### Theme Toggle im Code
-```javascript
-// Theme wechseln
-themeToggleBtn.addEventListener('click', function() {
-    body.classList.toggle('light-mode');
-    localStorage.setItem('theme', /* ... */);
-});
+### Flip-Animation anpassen
+
+```css
+.flip-container.flipped {
+    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+    /* Ändere Dauer und Easing nach Bedarf */
+}
 ```
-
-## 🔐 n8n Sicherheit & iframe Considerations
-
-### Wichtige Sicherheitshinweise
-
-1. **X-Frame-Options**: Stelle sicher, dass n8n iframe-fähig ist
-   ```nginx
-   proxy_hide_header X-Frame-Options;
-   add_header X-Frame-Options "SAMEORIGIN";
-   ```
-
-2. **Authentication**: n8n sollte mit Passwort geschützt sein
-   ```bash
-   # In n8n .env oder docker-compose.yml
-   N8N_BASIC_AUTH_ACTIVE=true
-   N8N_BASIC_AUTH_USER=admin
-   N8N_BASIC_AUTH_PASSWORD=secure_password
-   ```
-
-3. **CORS Headers**: Bei Bedarf CORS konfigurieren
-
-4. **HTTPS verwenden**: Besonders wichtig für Produktivumgebungen
 
 ## 🐛 Troubleshooting
 
-### iframe zeigt nichts an
+### iframe zeigt n8n nicht an
+
+- **Prüfe n8n Status**: Ist n8n unter `http://localhost:5678/` (oder `http://localhost:8080/n8n/` bei nginx) erreichbar?
+- **Prüfe iframe URL**: Stimmt die URL im `index.html` mit deinem Setup überein?
 - **Prüfe X-Frame-Options**: Konsole öffnen (F12) und nach Fehlern suchen
-- **Prüfe n8n URL**: Ist n8n unter `http://localhost:8080/n8n/` erreichbar?
 - **Browser Cache leeren**: Strg+Shift+R
 
 ### Flip-Animation funktioniert nicht
+
 - **JavaScript Fehler?**: Konsole prüfen (F12)
 - **CSS geladen?**: Netzwerk-Tab in DevTools prüfen
 - **Browser-Support**: Moderne Browser erforderlich (Chrome, Firefox, Safari, Edge)
 
 ### Theme wechselt nicht
+
 - **localStorage aktiviert?**: Private Browsing kann localStorage deaktivieren
 - **JavaScript aktiv?**: script.js korrekt eingebunden?
 
@@ -298,6 +271,7 @@ MIT License - siehe [LICENSE](LICENSE) für Details.
 ## 📧 Kontakt
 
 Bei Fragen oder Problemen:
+
 - **GitHub Issues**: [https://github.com/flowgrammer420/landingpage-n8n/issues](https://github.com/flowgrammer420/landingpage-n8n/issues)
 - **Email**: Über Kontaktformular auf der Landing Page
 
