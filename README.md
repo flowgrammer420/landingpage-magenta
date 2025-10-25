@@ -19,6 +19,7 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 - **Optimierte Asset-Auslieferung** durch Nginx
 
 ## 📁 Projektstruktur
+
 ```
 landingpage-n8n/
 │
@@ -58,6 +59,7 @@ docker compose up -d
 **Das war's! 🎉**
 
 ### Was passiert im Hintergrund?
+
 1. **Nginx Container** startet auf Port 8080
 2. **n8n Container** startet intern auf Port 8080 (wurde von 5678 angepasst)
 3. **Nginx** liefert statische Dateien aus und proxied `/n8n/` zu n8n
@@ -65,30 +67,36 @@ docker compose up -d
 
 ## ⚙️ Aktuelle Konfigurationsänderungen
 
-### n8n Umgebungsvariablen (Oktober 2025)
+### n8n Port-Konfiguration (Oktober 2025)
 
-Die folgenden Umgebungsvariablen wurden in `backend/docker-compose.yml` angepasst:
+Die folgenden Änderungen wurden vorgenommen, um Connection-Lost-Probleme zu beheben:
+
+#### 1. docker-compose.yml
+- n8n Service läuft jetzt mit **`ports: - "8080:8080"`**
+- Umgebungsvariable **`N8N_PORT=8080`** ist gesetzt (geändert von 5678)
 
 ```yaml
-environment:
-  - N8N_HOST=localhost
-  - N8N_PORT=8080                                    # Geändert von 5678 zu 8080
-  - N8N_PROTOCOL=http
-  - WEBHOOK_URL=http://localhost:8080/n8n/
-  - VUE_APP_URL_BASE_API=http://localhost:8080/n8n/ # Neu hinzugefügt
-  - N8N_PATH=/n8n/
-  - N8N_EDITOR_BASE_URL=http://localhost:8080/n8n/
+services:
+  n8n:
+    ports:
+      - "8080:8080"          # NEU: Port 8080 wird exponiert
+    environment:
+      - N8N_PORT=8080        # Geändert von 5678 zu 8080
 ```
 
-**Wichtige Änderungen:**
-- `N8N_PORT` wurde von `5678` auf `8080` geändert
-- `VUE_APP_URL_BASE_API` wurde hinzugefügt für bessere API-Integration
-- `N8N_HOST` bleibt `localhost`
-- Alle anderen Konfigurationen (nginx.conf, etc.) bleiben unverändert
+#### 2. nginx.conf
+- Proxy-Pass angepasst: **`proxy_pass http://n8n:8080/;`** (vorher: 5678)
 
-### ⚠️ Neustart nach Updates erforderlich
+```nginx
+location /n8n/ {
+    proxy_pass http://n8n:8080/;  # Geändert von 5678 zu 8080
+    # ... weitere Proxy-Einstellungen
+}
+```
 
-Nach einem `git pull` oder Konfigurationsänderungen **MUSS** das System neu gestartet werden:
+### ⚠️ WICHTIG: Neustart nach Konfigurationsänderungen erforderlich!
+
+Nach dem Aktualisieren der Konfigurationsdateien (docker-compose.yml oder nginx.conf) muss ein **kompletter Neustart** durchgeführt werden:
 
 ```bash
 cd backend
@@ -96,103 +104,75 @@ docker compose down
 docker compose up -d
 ```
 
-Oder für ein komplettes Rebuild:
+**Warum `docker compose down` und nicht nur `restart`?**
+- `down` entfernt die Container komplett und erstellt sie neu
+- Dadurch werden alle Konfigurationsänderungen garantiert übernommen
+- Port-Änderungen und Volume-Mappings werden korrekt angewendet
 
+**Alternative für Docker Desktop Nutzer:**
+1. Docker Desktop öffnen
+2. Container stoppen und löschen
+3. `docker compose up -d` im Terminal ausführen
+
+## 🔧 Verwaltung der Container
+
+### Container starten
 ```bash
-docker compose down
-docker compose pull
-docker compose up -d --force-recreate
-```
-
-**Hinweis:** Ein einfacher `docker compose restart` reicht NICHT aus, da Umgebungsvariablen nur beim Container-Start geladen werden!
-
-## 🔧 Container-Details
-
-### Nginx Container
-- **Image**: `nginx:alpine`
-- **Port**: `8080:80`
-- **Volumes**: 
-  - Landing Page Dateien (`index.html`, `assets/`)
-  - Nginx Konfiguration (`nginx.conf`)
-
-### n8n Container
-- **Image**: `n8nio/n8n:latest`
-- **Interner Port**: `8080`
-- **Volume**: `n8n-data` für persistente Workflows
-- **Network**: `landingpage-network` (shared mit nginx)
-
-## 📋 Nützliche Docker Compose Befehle
-
-### Container Management
-```bash
-# Alle Container starten
+cd backend
 docker compose up -d
+```
 
-# Container stoppen
-docker compose down
+### Container stoppen
+```bash
+docker compose stop
+```
 
-# Container neu starten (ohne Umgebungsvariablen-Neuladung)
+### Container neu starten (bei kleineren Änderungen)
+```bash
 docker compose restart
+```
 
-# Container neu erstellen (mit Umgebungsvariablen-Neuladung)
-docker compose down && docker compose up -d
+### Container komplett neu aufbauen (bei Konfigurationsänderungen)
+```bash
+docker compose down
+docker compose up -d
+```
 
-# Logs anzeigen
+### Logs anzeigen
+```bash
+# Alle Container
+docker compose logs
+
+# Nur n8n
+docker compose logs n8n
+
+# Nur Nginx
+docker compose logs nginx
+
+# Live-Logs verfolgen
 docker compose logs -f
+```
 
-# Logs nur von n8n
-docker compose logs -f n8n
-
-# Container Status
+### Status prüfen
+```bash
 docker compose ps
-```
-
-### Volumes & Daten
-```bash
-# Volumes anzeigen
-docker volume ls
-
-# n8n Volume inspizieren
-docker volume inspect backend_n8n-data
-
-# Container mit allen Volumes löschen
-docker compose down -v
-```
-
-### Updates & Wartung
-```bash
-# Images aktualisieren
-docker compose pull
-
-# Mit neuen Images neu starten
-docker compose up -d --force-recreate
-
-# Nicht verwendete Images aufräumen
-docker image prune
 ```
 
 ## 🐛 Troubleshooting
 
-### Container startet nicht
-```bash
-# Logs prüfen
-docker compose logs
+### n8n lädt nicht / Connection Lost
 
-# Container Status
-docker compose ps
-
-# Komplett neu aufbauen
-docker compose down -v
-docker compose up -d
-```
-
-### n8n nicht erreichbar
-1. Prüfe ob Container läuft: `docker compose ps`
+1. Container-Status prüfen: `docker compose ps`
 2. Prüfe nginx logs: `docker compose logs nginx`
 3. Prüfe n8n logs: `docker compose logs n8n`
 4. Teste direkten Zugriff: `curl http://localhost:8080/n8n/`
+5. **Falls Port-Konfiguration geändert wurde: Vollständigen Neustart durchführen!**
+   ```bash
+   docker compose down && docker compose up -d
+   ```
 
 ### Windows-spezifische Probleme
+
 ```bash
 # In WSL2 Terminal, falls Änderungen nicht erkannt werden:
 echo "export DOCKER_BUILDKIT=1" >> ~/.bashrc
@@ -200,6 +180,7 @@ source ~/.bashrc
 ```
 
 ### Port Konflikte
+
 ```bash
 # Alle verwendeten Ports anzeigen:
 netstat -an | findstr :8080
@@ -208,11 +189,13 @@ netstat -an | findstr :8080
 ## 📊 Monitoring & Logs
 
 ### Docker Desktop Dashboard nutzen
+
 1. Docker Desktop öffnen
 2. Containers > landingpage-n8n
 3. Logs und Stats in Echtzeit anzeigen
 
 ### Erweiterte Log-Konfiguration
+
 In `docker-compose.yml` hinzufügen:
 ```yaml
 services:
