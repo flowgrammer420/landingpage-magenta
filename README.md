@@ -1,14 +1,35 @@
-# 🌟 n8n Landingpage - Neon Dark Mode
+# 🌟 n8n Landingpage - Neon Dark/Light Mode
 
-Eine moderne Landing Page mit **Neon Dark Mode Design** und n8n Automatisierungs-Integration.
+Eine moderne Landing Page mit **Neon Dark/Light Mode Design** und n8n Automatisierungs-Integration.
 
 ## ✨ Design-Features
 
-- **Neon Dark Mode** - Dunkler Hintergrund mit leuchtenden Neonfarben
-- **Oldschool Neon-Look** - Neonblau (#00f0ff), Neongrün (#39ff14), Neonpink (#ff00de)
-- **Moderne Animationen** - Pulsierende Neon-Effekte, glühende Ränder, Hover-Effekte
-- **Orbitron Font** - Moderner Tech-Look mit Google Fonts Integration
-- **Responsive Design** - Optimiert für alle Bildschirmgrößen
+- **🌓 Dark/Light Mode Toggle** - Umschaltbar zwischen tiefschwarzen Darkmode und hellem Lightmode
+- **🎨 Tiefschwarz Darkmode (Default)** - Hintergrund #000 (tiefschwarz) mit kräftigen Neonfarben
+- **☀️ Light Mode** - Heller Hintergrund mit leuchtenden Farben
+- **💾 Theme-Persistenz** - Speichert die Auswahl im LocalStorage
+- **🎭 Oldschool Neon-Look** - Neonblau (#00f0ff), Neongrün (#39ff14), Neonpink (#ff1493)
+- **✨ Moderne Animationen** - Pulsierende Neon-Effekte, glühende Ränder, Hover-Effekte
+- **🔤 Orbitron Font** - Moderner Tech-Look mit Google Fonts Integration
+- **📱 Responsive Design** - Optimiert für alle Bildschirmgrößen
+
+## 🎯 Dark/Light Mode
+
+Der User kann oben rechts zwischen zwei Modi umschalten:
+
+### 🌙 Dark Mode (Standard)
+- Hintergrund: Tiefschwarz (#000)
+- Akzentfarben: Neongrün (#39ff14), Cyan (#00ffd0)
+- Maximale Neon-Wirkung auf schwarzem Grund
+- Animierte Background-Flicker-Effekte
+
+### ☀️ Light Mode
+- Hintergrund: Weiß (#ffffff)
+- Akzentfarben: Pink (#ff1493), Hot Pink (#ff69b4)
+- Helle, freundliche Atmosphäre
+- Angepasste Schatten und Effekte
+
+Der Toggle-Button passt sich automatisch an den aktiven Modus an und zeigt immer die nächste Option an.
 
 ## 📁 Projektstruktur
 
@@ -16,10 +37,10 @@ Eine moderne Landing Page mit **Neon Dark Mode Design** und n8n Automatisierungs
 landingpage-n8n/
 ├── assets/
 │   ├── css/
-│   │   └── style.css          # Neon Dark Mode Styling
+│   │   └── style.css          # Neon Dark/Light Mode Styling
 │   └── js/
-│       └── script.js           # Form-Handling & n8n Integration
-├── index.html                  # Hauptseite mit Neon-Design
+│       └── script.js           # Form-Handling, n8n Integration & Theme Toggle
+├── index.html                  # Hauptseite mit Theme-Toggle
 └── README.md                   # Diese Datei
 ```
 
@@ -57,160 +78,143 @@ landingpage-n8n/
    - Erstelle einen neuen Workflow in n8n
    - Füge einen "Webhook" Node hinzu
    - Kopiere die Webhook-URL
-   - Öffne `assets/js/script.js` und füge deine Webhook-URL ein:
-   ```javascript
-   const n8nWebhookUrl = 'https://deine-n8n-instanz.com/webhook/your-webhook-id';
-   ```
+   - Öffne `assets/js/script.js`
+   - Ersetze die URL in der CONFIG:
+     ```javascript
+     const CONFIG = {
+       n8nWebhookUrl: 'DEINE-N8N-WEBHOOK-URL-HIER'
+     };
+     ```
 
-## 🎨 Design-Anpassungen
+4. **Deployment**
+   
+   - **GitHub Pages**: Aktiviere GitHub Pages in den Repository-Settings
+   - **Eigener Server**: Kopiere alle Dateien in dein Webserver-Verzeichnis
+   - **Netlify/Vercel**: Verbinde dein Repository für automatisches Deployment
+
+## 🎨 Anpassungen
 
 ### Farben ändern
 
-Öffne `assets/css/style.css` und passe die Neonfarben an:
+Bearbeite `assets/css/style.css`:
 
+**Dark Mode Farben:**
 ```css
-/* Hauptfarben */
-#39ff14  /* Neongrün */
-#00f0ff  /* Neonblau */
-#ff00de  /* Neonpink */
-#00ffd0  /* Cyan */
+body.dark-mode {
+  background: #000;  /* Tiefschwarz */
+}
+
+h1, h2, h3 {
+  color: #39ff14;    /* Neongrün */
+  text-shadow: ... #00ffd0;  /* Cyan Glow */
+}
 ```
 
-### Animationen anpassen
-
-Animationsgeschwindigkeit ändern:
-
+**Light Mode Farben:**
 ```css
-/* In style.css */
-animation: bg-flicker 10s infinite alternate;  /* Hintergrund */
-animation: neon-glow 2s infinite alternate;    /* Container */
-animation: button-fade 2s infinite alternate;  /* Button */
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3 {
+  color: #ff1493;    /* Deep Pink */
+  text-shadow: ... #ff69b4;  /* Hot Pink Glow */
+}
 ```
 
-## 🧪 Testen mit neuen Daten
+### Texte ändern
 
-### Methode 1: Direktes Testen im Browser
+Bearbeite `index.html`:
+```html
+<h1>Dein Titel</h1>
+<h2>Dein Untertitel</h2>
+```
 
-1. Öffne die `index.html` im Browser
-2. Fülle das Formular mit Testdaten aus:
-   - **Name:** Max Mustermann
-   - **Email:** max@example.com
-   - **Nachricht:** Dies ist eine Testnachricht
-3. Klicke auf "Absenden"
-4. Überprüfe die Antwort auf der Seite
-5. Kontrolliere in n8n, ob der Webhook die Daten empfangen hat
+### Theme Toggle anpassen
 
-### Methode 2: Mit verschiedenen Browsern testen
+Bearbeite `assets/js/script.js`:
+```javascript
+const CONFIG = {
+  theme: {
+    storageKey: 'dein-storage-key',
+    darkMode: 'dark-mode',
+    lightMode: 'light-mode'
+  }
+};
+```
 
-Teste die Landingpage in verschiedenen Browsern:
+## 🔧 Technische Details
 
-- **Chrome/Edge:** Vollständige Unterstützung aller Effekte
-- **Firefox:** Gute Unterstützung
-- **Safari:** Teste besonders die Animationen
-- **Mobile Browsers:** Teste responsive Design
+### Theme Toggle Funktionalität
 
-### Methode 3: n8n Workflow testen
+- **LocalStorage-Persistenz**: Das gewählte Theme bleibt gespeichert
+- **Smooth Transitions**: Sanfte Übergänge zwischen den Modi (0.3s)
+- **Icon-Wechsel**: Toggle-Button zeigt ☀️ für Light Mode, 🌙 für Dark Mode
+- **Dynamische Farbwechsel**: Alle Elemente passen sich automatisch an
 
-1. **In n8n einen Test-Workflow erstellen:**
-   ```
-   Webhook → Function (Daten verarbeiten) → Email/Slack/Discord
-   ```
+### Browser-Kompatibilität
 
-2. **Webhook Node konfigurieren:**
+- Chrome/Edge: ✅
+- Firefox: ✅
+- Safari: ✅
+- Opera: ✅
+- Mobile Browser: ✅
+
+### Performance
+
+- Keine externen Bibliotheken (außer Google Fonts)
+- Vanilla JavaScript (keine jQuery)
+- CSS Transitions für GPU-Beschleunigung
+- LocalStorage für schnelles Theme-Loading
+
+## 📝 n8n Workflow Beispiel
+
+Ein einfacher n8n Workflow zum Empfangen der Formulardaten:
+
+1. **Webhook Node**
    - Method: POST
-   - Path: /contact-form
-   - Response Mode: "When Last Node Finishes"
+   - Response Mode: Immediately
 
-3. **Test-Daten senden:**
-   
-   Via cURL:
-   ```bash
-   curl -X POST https://deine-n8n-instanz.com/webhook/your-webhook-id \
-     -H "Content-Type: application/json" \
-     -d '{
-       "name": "Test User",
-       "email": "test@example.com",
-       "message": "Dies ist eine Testnachricht"
-     }'
-   ```
-   
-   Via JavaScript (Browser Console):
+2. **Function Node** (optional - Datenverarbeitung)
    ```javascript
-   fetch('https://deine-n8n-instanz.com/webhook/your-webhook-id', {
-     method: 'POST',
-     headers: {
-       'Content-Type': 'application/json',
-     },
-     body: JSON.stringify({
-       name: 'Test User',
-       email: 'test@example.com',
-       message: 'Dies ist eine Testnachricht'
-     })
-   })
-   .then(response => response.json())
-   .then(data => console.log('Erfolg:', data))
-   .catch((error) => console.error('Fehler:', error));
+   return {
+     name: $json.body.name,
+     email: $json.body.email,
+     message: $json.body.message,
+     timestamp: $json.body.timestamp
+   };
    ```
 
-### Methode 4: Formular mit verschiedenen Szenarien testen
+3. **Email Node** oder andere Aktionen
+   - Sende Benachrichtigung
+   - Speichere in Datenbank
+   - Trigger weitere Workflows
 
-Teste diese Szenarien:
+## 🎯 Features
 
-| Test-Szenario | Name | Email | Nachricht | Erwartetes Ergebnis |
-|--------------|------|-------|-----------|---------------------|
-| ✅ Gültige Daten | Max Mustermann | max@test.de | Hallo! | Erfolgsmeldung |
-| ❌ Leeres Feld | (leer) | test@test.de | Hallo | Validierungsfehler |
-| ❌ Ungültige Email | Max | ungültig | Hallo | Validierungsfehler |
-| ✅ Lange Nachricht | Test | test@test.de | 500+ Zeichen | Erfolgsmeldung |
-| ✅ Sonderzeichen | Müller | test@example.com | Ä Ö Ü ß | Erfolgsmeldung |
+✅ Responsive Design
+✅ Neon-Animationen
+✅ Dark/Light Mode mit Toggle
+✅ Theme-Persistenz (LocalStorage)
+✅ Form-Validierung
+✅ n8n Integration
+✅ Fehlerbehandlung
+✅ Loading-States
+✅ Accessibility (ARIA-Labels)
+✅ SEO-optimiert
 
-## 📝 Checkliste für Änderungen
+## 📜 Lizenz
 
-Wenn du das Design oder die Funktionalität anpasst:
-
-- [ ] **HTML geändert?** → Teste alle Links und Formulare
-- [ ] **CSS geändert?** → Teste in verschiedenen Browsern
-- [ ] **JavaScript geändert?** → Teste Formular-Submission
-- [ ] **n8n Webhook geändert?** → Teste Datenübermittlung
-- [ ] **Responsive Design geprüft?** → Teste auf Mobile/Tablet
-
-## 🔧 Fehlerbehebung
-
-### Formular sendet keine Daten
-
-1. Öffne Browser DevTools (F12)
-2. Wechsle zum "Network" Tab
-3. Sende das Formular ab
-4. Überprüfe die POST-Anfrage
-5. Kontrolliere die n8n Webhook-URL
-
-### Animationen funktionieren nicht
-
-1. Überprüfe, ob die CSS-Datei korrekt geladen wird
-2. Teste in einem anderen Browser
-3. Deaktiviere Browser-Erweiterungen (AdBlocker, etc.)
-
-### Neon-Effekte werden nicht angezeigt
-
-1. Stelle sicher, dass die Google Font (Orbitron) geladen wird
-2. Überprüfe die CSS box-shadow und text-shadow Regeln
-3. Teste mit aktivierter Hardware-Beschleunigung im Browser
-
-## 📚 Weitere Ressourcen
-
-- [n8n Dokumentation](https://docs.n8n.io/)
-- [n8n Webhook Guide](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/)
-- [Google Fonts - Orbitron](https://fonts.google.com/specimen/Orbitron)
-- [CSS Animations Guide](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations)
-
-## 📄 Lizenz
-
-Dieses Projekt steht unter der MIT Lizenz.
+MIT License - siehe [LICENSE](LICENSE) für Details.
 
 ## 🤝 Beitragen
 
-Fühle dich frei, Issues zu erstellen oder Pull Requests einzureichen!
+Pull Requests sind willkommen! Bei größeren Änderungen öffne bitte zuerst ein Issue.
+
+## 📞 Support
+
+Bei Fragen oder Problemen erstelle ein [Issue](https://github.com/flowgrammer420/landingpage-n8n/issues).
 
 ---
 
-© 2025 n8n Landing | Powered by n8n automation
+**Erstellt mit 💚 und ⚡ Neon-Power**
+
+*Powered by n8n Automation*
