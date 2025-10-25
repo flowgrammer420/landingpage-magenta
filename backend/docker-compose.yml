@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   nginx:
     image: nginx:alpine
@@ -15,15 +14,15 @@ services:
     restart: unless-stopped
     networks:
       - landingpage-network
-
   n8n:
     image: n8nio/n8n:latest
     container_name: landingpage-n8n
     environment:
       - N8N_HOST=localhost
-      - N8N_PORT=5678
+      - N8N_PORT=8080
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=http://localhost:8080/n8n/
+      - VUE_APP_URL_BASE_API=http://localhost:8080/n8n/
       - N8N_PATH=/n8n/
       - N8N_EDITOR_BASE_URL=http://localhost:8080/n8n/
     volumes:
@@ -31,11 +30,9 @@ services:
     restart: unless-stopped
     networks:
       - landingpage-network
-
 volumes:
   n8n-data:
     driver: local
-
 networks:
   landingpage-network:
     driver: bridge
