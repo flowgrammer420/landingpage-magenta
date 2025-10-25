@@ -1,4 +1,4 @@
-// n8n Landing Page - Neon Dark Mode - Form Handler
+// n8n Landing Page - Neon Dark/Light Mode - Form Handler & Theme Switcher
 // © 2025 n8n Landing
 
 // Konfiguration
@@ -15,12 +15,93 @@ const CONFIG = {
   },
   
   // Timeout für API-Anfragen (in Millisekunden)
-  timeout: 10000
+  timeout: 10000,
+  
+  // Theme-Einstellungen
+  theme: {
+    storageKey: 'n8n-landing-theme',
+    darkMode: 'dark-mode',
+    lightMode: 'light-mode'
+  }
 };
 
 // DOM-Elemente
 const contactForm = document.getElementById('contactForm');
 const responseMessage = document.getElementById('response-message');
+const themeToggleBtn = document.getElementById('theme-toggle');
+
+// =====================
+// THEME TOGGLE LOGIC
+// =====================
+
+// Theme initialisieren beim Laden der Seite
+function initTheme() {
+  // Prüfe ob Theme im localStorage gespeichert ist
+  const savedTheme = localStorage.getItem(CONFIG.theme.storageKey);
+  
+  if (savedTheme) {
+    // Verwende gespeichertes Theme
+    setTheme(savedTheme);
+  } else {
+    // Default: Dark Mode
+    setTheme(CONFIG.theme.darkMode);
+  }
+}
+
+// Theme setzen
+function setTheme(theme) {
+  const body = document.body;
+  
+  if (theme === CONFIG.theme.darkMode) {
+    body.classList.remove(CONFIG.theme.lightMode);
+    body.classList.add(CONFIG.theme.darkMode);
+    updateToggleButton('light'); // Zeige "Light Mode" als nächste Option
+  } else {
+    body.classList.remove(CONFIG.theme.darkMode);
+    body.classList.add(CONFIG.theme.lightMode);
+    updateToggleButton('dark'); // Zeige "Dark Mode" als nächste Option
+  }
+  
+  // Speichere Theme im localStorage
+  localStorage.setItem(CONFIG.theme.storageKey, theme);
+}
+
+// Toggle Button Text und Icon aktualisieren
+function updateToggleButton(nextMode) {
+  const toggleIcon = themeToggleBtn.querySelector('.toggle-icon');
+  const toggleText = themeToggleBtn.querySelector('.toggle-text');
+  
+  if (nextMode === 'light') {
+    toggleIcon.textContent = '☀️';
+    toggleText.textContent = 'Light Mode';
+    themeToggleBtn.setAttribute('aria-label', 'Switch to light mode');
+  } else {
+    toggleIcon.textContent = '🌙';
+    toggleText.textContent = 'Dark Mode';
+    themeToggleBtn.setAttribute('aria-label', 'Switch to dark mode');
+  }
+}
+
+// Theme Toggle Event Listener
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', () => {
+    const body = document.body;
+    const currentTheme = body.classList.contains(CONFIG.theme.darkMode) 
+      ? CONFIG.theme.darkMode 
+      : CONFIG.theme.lightMode;
+    
+    // Wechsle Theme
+    const newTheme = currentTheme === CONFIG.theme.darkMode 
+      ? CONFIG.theme.lightMode 
+      : CONFIG.theme.darkMode;
+    
+    setTheme(newTheme);
+  });
+}
+
+// =====================
+// FORM HANDLING LOGIC
+// =====================
 
 // Formular-Validierung
 function validateForm(formData) {
@@ -39,125 +120,113 @@ function validateForm(formData) {
     return { valid: false, error: 'Bitte gib eine gültige E-Mail-Adresse ein.' };
   }
   
-  // Prüfe Mindestlänge der Nachricht
+  // Prüfe Mindestlänge für Name
+  if (name.length < 2) {
+    return { valid: false, error: 'Name muss mindestens 2 Zeichen lang sein.' };
+  }
+  
+  // Prüfe Mindestlänge für Nachricht
   if (message.length < 10) {
-    return { valid: false, error: 'Die Nachricht muss mindestens 10 Zeichen lang sein.' };
+    return { valid: false, error: 'Nachricht muss mindestens 10 Zeichen lang sein.' };
   }
   
   return { valid: true };
 }
 
-// Anzeige der Response-Nachricht
-function showMessage(message, isSuccess = true) {
+// Nachricht anzeigen
+function showMessage(message, isError = false) {
   responseMessage.textContent = message;
   responseMessage.style.display = 'block';
-  responseMessage.style.color = isSuccess ? '#39ff14' : '#ff00de';
-  responseMessage.style.textShadow = isSuccess 
-    ? '0 0 10px #39ff14, 0 0 20px #39ff14'
-    : '0 0 10px #ff00de, 0 0 20px #ff00de';
+  responseMessage.style.color = isError ? '#ff1493' : '#39ff14';
   
-  // Verstecke die Nachricht nach 5 Sekunden
+  // Nach 5 Sekunden ausblenden
   setTimeout(() => {
     responseMessage.style.display = 'none';
   }, 5000);
 }
 
-// Formular-Submission Handler
-async function handleFormSubmit(event) {
-  event.preventDefault();
-  
-  // Hole Formular-Daten
-  const formData = new FormData(contactForm);
-  
-  // Validiere Formular
-  const validation = validateForm(formData);
-  if (!validation.valid) {
-    showMessage(validation.error, false);
-    return;
-  }
-  
-  // Erstelle JSON-Objekt
-  const data = {
-    name: formData.get('name').trim(),
-    email: formData.get('email').trim(),
-    message: formData.get('message').trim(),
-    timestamp: new Date().toISOString(),
-    source: 'Neon Landing Page'
-  };
-  
-  // Deaktiviere Submit-Button während der Anfrage
-  const submitButton = contactForm.querySelector('button[type="submit"]');
-  const originalButtonText = submitButton.textContent;
-  submitButton.disabled = true;
-  submitButton.textContent = 'Wird gesendet...';
+// Daten an n8n Webhook senden
+async function sendToN8n(formData) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), CONFIG.timeout);
   
   try {
-    // Sende Daten an n8n Webhook mit Timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), CONFIG.timeout);
-    
     const response = await fetch(CONFIG.n8nWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        name: formData.get('name'),
+        email: formData.get('email'),
+        message: formData.get('message'),
+        timestamp: new Date().toISOString()
+      }),
       signal: controller.signal
     });
     
     clearTimeout(timeoutId);
     
-    // Prüfe Response
     if (response.ok) {
-      showMessage(CONFIG.messages.success, true);
-      contactForm.reset(); // Formular zurücksetzen
+      return { success: true };
     } else {
-      console.error('Server Error:', response.status, response.statusText);
-      showMessage(CONFIG.messages.error, false);
+      return { success: false, error: CONFIG.messages.error };
     }
-    
   } catch (error) {
-    console.error('Fetch Error:', error);
+    clearTimeout(timeoutId);
     
     if (error.name === 'AbortError') {
-      showMessage('Zeitlimit überschritten. Bitte versuche es erneut.', false);
-    } else {
-      showMessage(CONFIG.messages.networkError, false);
+      return { success: false, error: 'Zeitüberschreitung. Bitte versuche es erneut.' };
     }
-  } finally {
-    // Aktiviere Submit-Button wieder
-    submitButton.disabled = false;
-    submitButton.textContent = originalButtonText;
+    
+    return { success: false, error: CONFIG.messages.networkError };
   }
 }
 
-// Event-Listener hinzufügen
+// Form Submit Event
 if (contactForm) {
-  contactForm.addEventListener('submit', handleFormSubmit);
-  
-  // Optionale Echtzeit-Validierung für bessere UX
-  const inputs = contactForm.querySelectorAll('input, textarea');
-  inputs.forEach(input => {
-    input.addEventListener('blur', function() {
-      if (this.value.trim() === '') {
-        this.style.borderColor = '#ff00de';
-        this.style.boxShadow = '0 0 20px #ff00de80';
-      } else {
-        this.style.borderColor = '#39ff14';
-        this.style.boxShadow = '0 0 10px #39ff1480';
-      }
-    });
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    input.addEventListener('focus', function() {
-      this.style.borderColor = '#00ffd0';
-      this.style.boxShadow = '0 0 20px #00ffd080';
-    });
+    // Formular-Daten sammeln
+    const formData = new FormData(contactForm);
+    
+    // Validierung
+    const validation = validateForm(formData);
+    if (!validation.valid) {
+      showMessage(validation.error, true);
+      return;
+    }
+    
+    // Lade-Indikator (Button deaktivieren)
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = '⏳ Sende...';
+    
+    // Daten senden
+    const result = await sendToN8n(formData);
+    
+    // Button wieder aktivieren
+    submitButton.disabled = false;
+    submitButton.textContent = originalButtonText;
+    
+    // Ergebnis anzeigen
+    if (result.success) {
+      showMessage(CONFIG.messages.success, false);
+      contactForm.reset();
+    } else {
+      showMessage(result.error, true);
+    }
   });
-} else {
-  console.error('Formular mit ID "contactForm" nicht gefunden.');
 }
 
-// Console-Log für Debugging
-console.log('%c🌟 n8n Landing Page - Neon Dark Mode', 'color: #39ff14; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #39ff14;');
-console.log('%cForm Handler initialisiert', 'color: #00f0ff; font-size: 14px;');
-console.log('%cBitte konfiguriere die n8n Webhook-URL in script.js', 'color: #ff00de; font-size: 12px;');
+// =====================
+// INITIALIZATION
+// =====================
+
+// Initialisiere Theme beim Laden der Seite
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  console.log('✨ n8n Landing Page geladen - Neon Dark/Light Mode aktiv!');
+});
