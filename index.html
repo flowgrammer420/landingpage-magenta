@@ -8,7 +8,15 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://fonts.googleapis.com/css?family=Orbitron:700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="dark-mode">
+  <!-- Theme Toggle Switch -->
+  <div class="theme-toggle-wrapper">
+    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light mode">
+      <span class="toggle-icon">☀️</span>
+      <span class="toggle-text">Light Mode</span>
+    </button>
+  </div>
+
   <nav>
     <a href="#home">Home</a>
     <a href="#features">Features</a>
@@ -33,10 +41,8 @@
     </form>
     
     <div id="response-message" style="display: none; margin-top: 20px; color: #39ff14;"></div>
-    
-    <p style="color:#fff; margin-top:20px; text-align: center;">© 2025 n8n Landing.<br>Powered by n8n automation.</p>
   </div>
-  
+
   <script src="assets/js/script.js"></script>
 </body>
 </html>
