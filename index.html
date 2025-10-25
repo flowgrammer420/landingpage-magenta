@@ -1,48 +1,73 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="n8n Landing - Automate Workflows im Neon-Style!">
-  <title>n8n Landingpage - Neon Darkmode</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <link href="https://fonts.googleapis.com/css?family=Orbitron:700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="n8n Landing - Automate Workflows im Neon-Style!">
+    <title>n8n Landingpage - Neon Darkmode</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap">
 </head>
-<body class="dark-mode">
-  <!-- Theme Toggle Switch -->
-  <div class="theme-toggle-wrapper">
-    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light mode">
-      <span class="toggle-icon">☀️</span>
-      <span class="toggle-text">Light Mode</span>
-    </button>
-  </div>
+<body>
+    <!-- Flip Container -->
+    <div class="flip-container" id="flip-container">
+        <!-- Front Side (Landing Page) -->
+        <div class="flip-box-front">
+            <!-- Theme Toggle Switch -->
+            <div class="theme-toggle-wrapper">
+                <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle dark/light mode">
+                    <span class="toggle-icon">☀️</span>
+                    <span class="toggle-text">Light Mode</span>
+                </button>
+            </div>
 
-  <nav>
-    <a href="#home">Home</a>
-    <a href="#features">Features</a>
-    <a href="#contact">Contact</a>
-  </nav>
-  
-  <div class="container">
-    <h1>n8n Landing</h1>
-    <h2>Automate Workflows im Neon-Style!</h2>
-    
-    <form id="contactForm" action="#" method="POST">
-      <label for="name">Name *</label>
-      <input id="name" name="name" type="text" required>
-      
-      <label for="email">Email *</label>
-      <input id="email" name="email" type="email" required>
-      
-      <label for="msg">Nachricht *</label>
-      <textarea id="msg" name="message" rows="5" required></textarea>
-      
-      <button type="submit">Absenden</button>
-    </form>
-    
-    <div id="response-message" style="display: none; margin-top: 20px; color: #39ff14;"></div>
-  </div>
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#features">Features</a>
+                <a href="#contact">Contact</a>
+                <a href="#" id="admin-link" class="admin-link">Admin Bereich</a>
+            </nav>
 
-  <script src="assets/js/script.js"></script>
+            <div class="container">
+                <h1>n8n Landing</h1>
+                <p>Automate Workflows im Neon-Style!</p>
+
+                <form id="contactForm" action="#" method="POST">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="msg">Nachricht *</label>
+                    <textarea id="msg" name="message" rows="5" required></textarea>
+
+                    <button type="submit">Absenden</button>
+                </form>
+
+                <div id="response-message" style="display: none; margin-top: 20px; color: #39ff14;"></div>
+            </div>
+        </div>
+
+        <!-- Back Side (n8n iframe) -->
+        <div class="flip-box-back">
+            <div class="back-header">
+                <button class="back-button" id="back-button" aria-label="Zurück zur Landingpage">
+                    ← Zurück
+                </button>
+                <h2>n8n Admin Panel</h2>
+            </div>
+            <div class="iframe-container">
+                <iframe src="http://localhost:8080/n8n/" 
+                        title="n8n Workflow Automation" 
+                        id="n8n-iframe"
+                        frameborder="0" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/script.js"></script>
 </body>
 </html>

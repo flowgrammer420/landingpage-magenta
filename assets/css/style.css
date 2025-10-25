@@ -1,52 +1,148 @@
-/* n8n Landingpage - Neon Dark/Light Mode Style */
+/* ======================================
+   CSS Variables for Theme Colors
+======================================= */
+:root {
+  --bg-color: #0a0e27;
+  --text-color: #39ff14;
+  --neon-glow: #39ff14;
+  --nav-bg: rgba(57, 255, 20, 0.1);
+  --form-bg: rgba(10, 14, 39, 0.7);
+  --btn-hover: #2fe600;
+  --shadow: rgba(57, 255, 20, 0.6);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: #39ff14;
+}
 
-/* Reset */
+/* Light Mode */
+body.light-mode {
+  --bg-color: #f0f4f8;
+  --text-color: #1a1a2e;
+  --neon-glow: #0066ff;
+  --nav-bg: rgba(0, 102, 255, 0.1);
+  --form-bg: rgba(255, 255, 255, 0.9);
+  --btn-hover: #0052cc;
+  --shadow: rgba(0, 102, 255, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --input-border: #0066ff;
+}
+
+/* ======================================
+   Basic Styles
+======================================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Dark Mode (Default) */
 body {
-  background: #000;
-  color: #fff;
-  font-family: 'Orbitron', Arial, sans-serif;
-  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
   min-height: 100vh;
+  perspective: 2000px;
+}
+
+/* ======================================
+   Flip Container & 3D Flip Effect
+======================================= */
+.flip-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.flip-container.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-box-front,
+.flip-box-back {
+  position: absolute;
+  width: 100%;
+  min-height: 100vh;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-box-front {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.flip-box-back {
+  transform: rotateY(180deg);
+  background: var(--bg-color);
   display: flex;
   flex-direction: column;
+}
+
+/* ======================================
+   Back Side (iframe container)
+======================================= */
+.back-header {
+  padding: 15px 30px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--neon-glow);
+  display: flex;
   align-items: center;
-  justify-content: center;
-  transition: background 0.3s ease, color 0.3s ease;
+  gap: 20px;
+  box-shadow: 0 2px 20px var(--shadow);
+  z-index: 10;
 }
 
-body.dark-mode {
-  background: #000;
-  color: #fff;
-  animation: bg-flicker-dark 10s infinite alternate;
+.back-button {
+  padding: 10px 25px;
+  background: var(--neon-glow);
+  color: var(--bg-color);
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px var(--shadow);
+  font-family: 'Orbitron', sans-serif;
 }
 
-body.light-mode {
-  background: #ffffff;
-  color: #000;
-  animation: bg-flicker-light 10s infinite alternate;
+.back-button:hover {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 25px var(--shadow);
 }
 
-/* Background animations */
-@keyframes bg-flicker-dark {
-  0% { background: #000; }
-  50% { background: #1a0033; }
-  100% { background: #000; }
+.back-header h2 {
+  color: var(--neon-glow);
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 15px var(--shadow);
+  font-size: 1.8rem;
 }
 
-@keyframes bg-flicker-light {
-  0% { background: #ffffff; }
-  50% { background: #f0f0ff; }
-  100% { background: #ffffff; }
+.iframe-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-color);
 }
 
-/* Theme Toggle Button */
+.iframe-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--bg-color);
+}
+
+/* ======================================
+   Theme Toggle Button
+======================================= */
 .theme-toggle-wrapper {
   position: fixed;
   top: 20px;
@@ -55,249 +151,235 @@ body.light-mode {
 }
 
 .theme-toggle-btn {
-  background: rgba(57, 255, 20, 0.2);
-  border: 2px solid #39ff14;
-  color: #39ff14;
-  padding: 12px 20px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-family: 'Orbitron', Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--neon-glow);
+  border-radius: 30px;
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
+  box-shadow: 0 0 20px var(--shadow);
+  font-family: 'Orbitron', sans-serif;
 }
 
 .theme-toggle-btn:hover {
-  background: rgba(57, 255, 20, 0.3);
-  box-shadow: 0 0 15px #39ff14, 0 0 30px #39ff14, 0 0 45px #39ff14;
-  transform: scale(1.05);
+  background: var(--neon-glow);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 25px var(--shadow);
 }
 
 .toggle-icon {
-  font-size: 18px;
+  font-size: 20px;
+  transition: transform 0.3s ease;
 }
 
-/* Light mode toggle button styling */
-body.light-mode .theme-toggle-btn {
-  background: rgba(255, 20, 147, 0.2);
-  border: 2px solid #ff1493;
-  color: #ff1493;
-  box-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493;
+.theme-toggle-btn:hover .toggle-icon {
+  transform: rotate(180deg);
 }
 
-body.light-mode .theme-toggle-btn:hover {
-  background: rgba(255, 20, 147, 0.3);
-  box-shadow: 0 0 15px #ff1493, 0 0 30px #ff1493, 0 0 45px #ff1493;
-}
-
-/* Headings - Dark Mode */
-h1, h2, h3 {
-  color: #39ff14;
-  text-shadow:
-    0 0 10px #39ff14,
-    0 0 20px #39ff14,
-    0 0 30px #39ff14,
-    0 0 40px #00ffd0;
-  margin-bottom: 20px;
-  text-align: center;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-/* Headings - Light Mode */
-body.light-mode h1,
-body.light-mode h2,
-body.light-mode h3 {
-  color: #ff1493;
-  text-shadow:
-    0 0 8px #ff1493,
-    0 0 16px #ff1493,
-    0 0 24px #ff1493,
-    0 0 32px #ff69b4;
-}
-
-/* Navigation */
+/* ======================================
+   Navigation
+======================================= */
 nav {
-  background: rgba(0, 255, 255, 0.1);
-  padding: 15px;
-  width: 100%;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  padding: 15px 30px;
   text-align: center;
-  box-shadow: 0 0 15px #00ffd0;
-  transition: all 0.3s ease;
-}
-
-body.light-mode nav {
-  background: rgba(255, 20, 147, 0.1);
-  box-shadow: 0 0 15px #ff1493;
+  border-bottom: 2px solid var(--neon-glow);
+  box-shadow: 0 2px 20px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 999;
 }
 
 nav a {
-  color: #00ffd0;
+  color: var(--neon-glow);
   text-decoration: none;
-  margin: 0 15px;
+  margin: 0 20px;
   font-weight: bold;
-  text-shadow: 0 0 5px #00ffd0;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
-}
-
-body.light-mode nav a {
-  color: #ff1493;
-  text-shadow: 0 0 5px #ff1493;
+  text-shadow: 0 0 10px var(--shadow);
+  font-family: 'Orbitron', sans-serif;
 }
 
 nav a:hover {
-  text-shadow: 0 0 10px #00ffd0, 0 0 20px #00ffd0;
+  color: var(--btn-hover);
+  text-shadow: 0 0 20px var(--shadow);
+  transform: translateY(-2px);
 }
 
-body.light-mode nav a:hover {
-  text-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493;
+.admin-link {
+  padding: 8px 20px;
+  background: var(--neon-glow);
+  color: var(--bg-color);
+  border-radius: 25px;
+  box-shadow: 0 0 15px var(--shadow);
 }
 
-/* Container */
+.admin-link:hover {
+  background: var(--btn-hover);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 5px 25px var(--shadow);
+}
+
+/* ======================================
+   Container
+======================================= */
 .container {
-  background: rgba(0, 0, 0, 0.7);
+  max-width: 800px;
+  margin: 80px auto;
   padding: 40px;
+  background: var(--form-bg);
   border-radius: 15px;
-  box-shadow: 0 0 30px #39ff14, 0 0 60px #00ffd0;
-  max-width: 600px;
-  width: 90%;
-  margin: 20px;
-  transition: all 0.3s ease;
+  box-shadow: 0 0 50px var(--shadow);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--neon-glow);
 }
 
-body.light-mode .container {
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 30px #ff1493, 0 0 60px #ff69b4;
+h1 {
+  text-align: center;
+  font-size: 3rem;
+  color: var(--neon-glow);
+  text-shadow: 0 0 30px var(--shadow), 0 0 50px var(--shadow);
+  margin-bottom: 20px;
+  font-family: 'Orbitron', sans-serif;
+  animation: neonPulse 2s infinite alternate;
 }
 
-/* Form Elements */
+@keyframes neonPulse {
+  0% {
+    text-shadow: 0 0 20px var(--shadow), 0 0 40px var(--shadow);
+  }
+  100% {
+    text-shadow: 0 0 30px var(--shadow), 0 0 60px var(--shadow);
+  }
+}
+
+p {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  color: var(--text-color);
+}
+
+/* ======================================
+   Form Styles
+======================================= */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 label {
-  display: block;
-  margin-top: 15px;
-  color: #39ff14;
   font-weight: bold;
-  text-shadow: 0 0 5px #39ff14;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  color: var(--text-color);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-body.light-mode label {
-  color: #ff1493;
-  text-shadow: 0 0 5px #ff1493;
-}
-
-input,
+input[type="text"],
+input[type="email"],
 textarea {
-  width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  border: 2px solid #39ff14;
+  padding: 15px;
+  border: 2px solid var(--input-border);
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #39ff14;
-  font-family: 'Orbitron', Arial, sans-serif;
-  box-shadow: 0 0 10px #39ff14;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 1rem;
   transition: all 0.3s ease;
-}
-
-body.light-mode input,
-body.light-mode textarea {
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #ff1493;
-  color: #ff1493;
-  box-shadow: 0 0 10px #ff1493;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 input:focus,
 textarea:focus {
   outline: none;
-  box-shadow: 0 0 15px #39ff14, 0 0 30px #00ffd0;
-  border-color: #00ffd0;
+  border-color: var(--btn-hover);
+  box-shadow: 0 0 20px var(--shadow);
+  background: var(--input-bg);
 }
 
-body.light-mode input:focus,
-body.light-mode textarea:focus {
-  box-shadow: 0 0 15px #ff1493, 0 0 30px #ff69b4;
-  border-color: #ff69b4;
-}
-
-/* Button */
 button[type="submit"] {
-  margin-top: 20px;
-  padding: 12px 30px;
-  background: linear-gradient(90deg, #39ff14, #00ffd0);
-  color: #000;
+  padding: 15px;
+  background: var(--neon-glow);
+  color: var(--bg-color);
   border: none;
-  border-radius: 25px;
+  border-radius: 8px;
+  font-size: 1.2rem;
   font-weight: bold;
-  font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 0 20px #39ff14;
-  font-family: 'Orbitron', Arial, sans-serif;
   transition: all 0.3s ease;
-}
-
-body.light-mode button[type="submit"] {
-  background: linear-gradient(90deg, #ff1493, #ff69b4);
-  color: #fff;
-  box-shadow: 0 0 20px #ff1493;
+  box-shadow: 0 0 20px var(--shadow);
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 button[type="submit"]:hover {
-  box-shadow: 0 0 30px #39ff14, 0 0 60px #00ffd0;
-  transform: scale(1.05);
+  background: var(--btn-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px var(--shadow);
 }
 
-body.light-mode button[type="submit"]:hover {
-  box-shadow: 0 0 30px #ff1493, 0 0 60px #ff69b4;
-}
-
-/* Response Message */
-#response-message {
-  text-align: center;
-  font-weight: bold;
-  text-shadow: 0 0 10px currentColor;
-}
-
-body.light-mode #response-message {
-  color: #ff1493 !important;
-}
-
-/* Animations */
-@keyframes glow {
-  0%, 100% {
-    text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
-  }
-  50% {
-    text-shadow: 0 0 20px #39ff14, 0 0 40px #00ffd0;
-  }
-}
-
-h1 {
-  animation: glow 2s ease-in-out infinite;
-}
-
-/* Responsive */
+/* ======================================
+   Responsive Design
+======================================= */
 @media (max-width: 768px) {
   .container {
-    padding: 20px;
-    margin: 10px;
+    margin: 40px 20px;
+    padding: 25px;
   }
-  
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  nav a {
+    margin: 0 10px;
+    font-size: 0.9rem;
+  }
+
+  .theme-toggle-btn {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+
+  .back-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .back-header h2 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  nav {
+    padding: 10px;
+  }
+
+  nav a {
+    display: block;
+    margin: 10px 0;
+  }
+
   .theme-toggle-wrapper {
     top: 10px;
     right: 10px;
-  }
-  
-  .theme-toggle-btn {
-    padding: 10px 16px;
-    font-size: 12px;
-  }
-  
-  nav a {
-    margin: 0 8px;
-    font-size: 14px;
   }
 }
