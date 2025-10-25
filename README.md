@@ -1,280 +1,292 @@
-# 🌟 n8n Landingpage - Neon Dark/Light Mode mit 3D-Flip Funktion
+ntwprten # 🌟 n8n Landingpage - Docker Desktop Edition
 
-Eine moderne, responsive Landing Page für n8n mit Dark/Light Mode und innovativer **3D-Flip-Funktion** zum Admin-Bereich!
+Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Reverse Proxy und 3D-Flip-Funktion!
 
 ## ✨ Features
 
-### 🎨 Design & Styling
+### 🐳 Docker Integration
+- **Ein-Befehl-Deployment**: `docker compose up -d` startet alles
+- **Nginx Reverse Proxy**: Statische Landing Page und n8n hinter `/n8n/`
+- **Automatische Container-Orchestrierung**: Nginx wartet auf n8n
+- **Persistent Storage**: n8n Daten bleiben bei Container-Neustarts erhalten
+- **Optimierte Nginx-Konfiguration**: Gzip, Caching und Proxy-Settings
+
+### 🎨 Design & UI
 - **Neon-inspiriertes Design** mit leuchtenden Effekten
-- **Dark/Light Mode Toggle** mit persistenter Speicherung (localStorage)
-- **Responsive Design** für alle Bildschirmgrößen (Desktop, Tablet, Mobile)
-- **CSS Variables** für einfache Theme-Anpassung
-- **Smooth Animations** und Übergänge
-
-### 🔄 3D-Flip-Box-Funktion
-- **CSS 3D-Transformation**: Flip-Effekt zwischen Landing Page und Admin Panel
-- **Intuitive Navigation**: Klick auf "Admin Bereich" flippt zur n8n-Oberfläche
-- **Zurück-Button**: Einfache Rückkehr zur Landing Page
-- **Escape-Taste**: Keyboard-Shortcut zum Zurückkehren
-- **Smooth Animation**: 0.8s cubic-bezier Übergang für flüssige Bewegung
-
-### 🛠️ Technische Features
-- **iframe Integration**: n8n läuft in vollständigem iframe auf der Rückseite
-- **Backface-Visibility**: Verhindert Sichtbarkeit der Rückseite während der Animation
-- **Transform-Style Preserve-3D**: Echte 3D-Transformation
-- **Kontaktformular** mit Validierung und Erfolgsanzeige
-- **Smooth Scroll** für Navigationslinks
+- **Dark/Light Mode Toggle** mit persistenter Speicherung
+- **3D-Flip-Animation**: Smooth Übergang zwischen Landing Page und n8n
+- **Responsive Design** für alle Bildschirmgrößen
+- **Optimierte Asset-Auslieferung** durch Nginx
 
 ## 📁 Projektstruktur
 
 ```
 landingpage-n8n/
 │
-├── index.html              # Haupt-HTML mit Flip-Container
+├── index.html              # Landing Page (iframe nutzt /n8n/)
 ├── README.md               # Diese Dokumentation
-│
-└── assets/
-    ├── css/
-    │   └── style.css       # Styling inkl. 3D-Flip & Theme
-    └── js/
-        └── script.js       # JavaScript für Flip & Theme Toggle
+├── assets/                 # Statische Assets
+│   ├── css/style.css       # Styling inkl. 3D-Flip & Themes
+│   └── js/script.js        # JavaScript für Flip & Theme Toggle
+└── backend/                # Docker Infrastructure
+    ├── docker-compose.yml  # Container-Orchestrierung
+    └── nginx.conf          # Nginx Reverse Proxy Config
 ```
 
-## 🚀 Installation & Setup
+## 🚀 Quick Start mit Docker Desktop
 
-### 1. Repository klonen
+### Voraussetzungen
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installiert und gestartet
+- Git installiert
 
+### Step-by-Step Anleitung
+
+#### 1. Repository klonen
 ```bash
 git clone https://github.com/flowgrammer420/landingpage-n8n.git
 cd landingpage-n8n
 ```
 
-### 2. n8n lokal starten
-
+#### 2. Docker Compose starten
 ```bash
-# Mit Docker (direkt auf Port 5678)
-docker run -d \
-  --name n8n \
-  -p 5678:5678 \
-  -v ~/.n8n:/home/node/.n8n \
-  n8nio/n8n
-
-# Oder mit npm
-npm install n8n -g
-n8n start
+cd backend
+docker compose up -d
 ```
 
-### 3. Landing Page öffnen
+#### 3. Im Browser öffnen
+Öffne: http://localhost:8080
 
+**Das war's! 🎉**
+
+### Was passiert im Hintergrund?
+1. **Nginx Container** startet auf Port 8080
+2. **n8n Container** startet intern auf Port 5678
+3. **Nginx** liefert statische Dateien aus und proxied `/n8n/` zu n8n
+4. **Landing Page** lädt mit funktionierendem iframe zu `/n8n/`
+
+## 🔧 Container-Details
+
+### Nginx Container
+- **Image**: `nginx:alpine`
+- **Port**: `8080:80`
+- **Volumes**: 
+  - Landing Page Dateien (`index.html`, `assets/`)
+  - Nginx Konfiguration
+
+### n8n Container
+- **Image**: `n8nio/n8n:latest`
+- **Umgebungsvariablen**:
+  - `N8N_PATH=/n8n/` - Läuft unter Subpath
+  - `WEBHOOK_URL=http://localhost:8080/n8n/`
+- **Persistent Volume**: `n8n-data` für Workflow-Daten
+
+## 📋 Wichtige Docker Desktop Befehle
+
+### Container-Status prüfen
 ```bash
-# Mit Python Simple HTTP Server
-python3 -m http.server 8000
-
-# Oder mit Node.js http-server
-npx http-server -p 8000
+docker compose ps
 ```
 
-Öffne im Browser: `http://localhost:8000`
-
-## ⚙️ iframe Konfiguration
-
-Das iframe im Admin-Bereich kann auf zwei Arten konfiguriert werden:
-
-### Option 1: Direkter Zugriff (Standard)
-
-**Aktuell aktiv** - Das iframe zeigt direkt auf die n8n-Instanz:
-
-```html
-<iframe src="http://localhost:5678/" ...>
-```
-
-**Vorteile:**
-- Einfachste Konfiguration
-- Keine zusätzlichen Proxy-Server notwendig
-- Direkte Verbindung zu n8n
-
-**Setup:**
-- n8n muss auf Port 5678 laufen (Standardport)
-- Keine weiteren Konfigurationen notwendig
-
-### Option 2: Via nginx Reverse Proxy
-
-Für produktive Umgebungen oder komplexere Setups:
-
-```html
-<iframe src="http://localhost:8080/n8n/" ...>
-```
-
-**Vorteile:**
-- Mehrere Services über einen Port
-- SSL/TLS-Terminierung möglich
-- Zusätzliche Sicherheitsfeatures
-- URL-Pfad-basiertes Routing
-
-**Anpassung in index.html:**
-
-Ändere die iframe-URL in der Datei `index.html` (Zeile ~63):
-
-```html
-<!-- Für nginx Proxy: -->
-<iframe src="http://localhost:8080/n8n/" 
-        title="n8n Workflow Automation" 
-        id="n8n-iframe"
-        frameborder="0" 
-        allowfullscreen>
-</iframe>
-```
-
-## 🔧 nginx Reverse Proxy Konfiguration
-
-Für produktive Umgebungen empfehlen wir einen nginx Reverse Proxy:
-
-```nginx
-server {
-    listen 8080;
-    server_name localhost;
-
-    # Landing Page
-    location / {
-        root /pfad/zu/landingpage-n8n;
-        index index.html;
-        try_files $uri $uri/ =404;
-    }
-
-    # n8n Proxy
-    location /n8n/ {
-        proxy_pass http://localhost:5678/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Wichtig für iframe Integration
-        proxy_hide_header X-Frame-Options;
-        add_header X-Frame-Options "SAMEORIGIN";
-    }
-}
-```
-
-**nginx starten:**
-
+### Logs anzeigen
 ```bash
-# Konfiguration testen
-nginx -t
+# Alle Container
+docker compose logs -f
 
-# nginx starten/neuladen
-sudo systemctl restart nginx
+# Nur n8n
+docker compose logs -f n8n
+
+# Nur Nginx
+docker compose logs -f nginx
 ```
 
-## 🎯 Anwendungsfälle
-
-### Entwicklungsumgebung
-- **Empfehlung:** Option 1 (Direkter Zugriff)
-- Schnelles Setup ohne zusätzliche Konfiguration
-- n8n läuft direkt auf Port 5678
-
-### Produktionsumgebung
-- **Empfehlung:** Option 2 (nginx Proxy)
-- Professionelles Setup mit SSL
-- Mehrere Services über einen Port
-- Bessere Kontrolle und Sicherheit
-
-## 🎨 Anpassungen
-
-### Theme-Farben ändern
-
-Bearbeite `assets/css/style.css` und passe die CSS-Variablen an:
-
-```css
-:root {
-    --primary-color: #39ff14;      /* Neon-Grün */
-    --secondary-color: #ff073a;    /* Neon-Rot */
-    --accent-color: #00d4ff;       /* Neon-Blau */
-    /* ... weitere Variablen */
-}
+### Container stoppen
+```bash
+docker compose down
 ```
 
-### Flip-Animation anpassen
+### Container stoppen + Volumes löschen (⚠️ Löscht n8n Daten!)
+```bash
+docker compose down -v
+```
 
-```css
-.flip-container.flipped {
-    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
-    /* Ändere Dauer und Easing nach Bedarf */
-}
+### Container neustarten
+```bash
+docker compose restart
+```
+
+### Images updaten
+```bash
+docker compose pull
+docker compose up -d
+```
+
+## 🔧 Konfiguration anpassen
+
+### Port ändern
+In `backend/docker-compose.yml`:
+```yaml
+services:
+  nginx:
+    ports:
+      - "3000:80"  # Ändere 8080 zu gewünschtem Port
+```
+
+### n8n Konfiguration
+In `backend/docker-compose.yml` unter `n8n.environment`:
+```yaml
+environment:
+  - N8N_HOST=localhost
+  - N8N_BASIC_AUTH_ACTIVE=true  # Basis-Authentifizierung aktivieren
+  - N8N_BASIC_AUTH_USER=admin
+  - N8N_BASIC_AUTH_PASSWORD=password
 ```
 
 ## 🐛 Troubleshooting
 
-### iframe zeigt n8n nicht an
+### Landing Page lädt nicht
+1. **Docker Desktop läuft?**
+   ```bash
+   docker --version
+   ```
 
-- **Prüfe n8n Status**: Ist n8n unter `http://localhost:5678/` (oder `http://localhost:8080/n8n/` bei nginx) erreichbar?
-- **Prüfe iframe URL**: Stimmt die URL im `index.html` mit deinem Setup überein?
-- **Prüfe X-Frame-Options**: Konsole öffnen (F12) und nach Fehlern suchen
-- **Browser Cache leeren**: Strg+Shift+R
+2. **Container Status prüfen**
+   ```bash
+   docker compose ps
+   ```
 
-### Flip-Animation funktioniert nicht
+3. **Port bereits belegt?**
+   - Port in `docker-compose.yml` ändern
+   - Oder anderen Service auf Port 8080 stoppen
 
-- **JavaScript Fehler?**: Konsole prüfen (F12)
-- **CSS geladen?**: Netzwerk-Tab in DevTools prüfen
-- **Browser-Support**: Moderne Browser erforderlich (Chrome, Firefox, Safari, Edge)
+### n8n iframe zeigt Fehler
+1. **n8n Container läuft?**
+   ```bash
+   docker compose logs n8n
+   ```
 
-### Theme wechselt nicht
+2. **Nginx Proxy Konfiguration prüfen**
+   ```bash
+   docker compose logs nginx
+   ```
 
-- **localStorage aktiviert?**: Private Browsing kann localStorage deaktivieren
-- **JavaScript aktiv?**: script.js korrekt eingebunden?
+3. **Browser Cache leeren**: Strg+Shift+R
 
-## 📱 Responsive Breakpoints
+### Assets laden nicht
+1. **Nginx Volumes prüfen**
+   ```bash
+   docker compose config
+   ```
 
-```css
-/* Tablet & Mobile */
-@media (max-width: 768px) {
-  /* Anpassungen für Tablets */
-}
+2. **File Permissions** (Linux/Mac):
+   ```bash
+   chmod -R 755 assets/
+   ```
 
-/* Mobile nur */
-@media (max-width: 480px) {
-  /* Anpassungen für Smartphones */
-}
+### Performance optimieren
+1. **Docker Desktop Ressourcen erhöhen**
+   - Settings > Resources > Advanced
+   - RAM: minimum 4GB empfohlen
+   - CPU: 2+ Cores
+
+## 🔄 Development Workflow
+
+### Änderungen an statischen Dateien
+```bash
+# Nach Änderungen an index.html oder assets/:
+docker compose restart nginx
 ```
 
-## 🚧 Geplante Features
+### Nginx Konfiguration ändern
+```bash
+# Nach Änderungen an nginx.conf:
+docker compose restart nginx
+```
 
-- [ ] **Multi-Page Flip**: Mehrere Admin-Panels (n8n, Grafana, etc.)
-- [ ] **Animation Options**: Verschiedene Flip-Animationen wählbar
-- [ ] **Progressive Web App**: Offline-Funktionalität
-- [ ] **API Integration**: Kontaktformular an Backend anbinden
-- [ ] **Analytics**: Nutzungsstatistiken
+### n8n Konfiguration ändern
+```bash
+# Nach Änderungen an docker-compose.yml (n8n section):
+docker compose up -d n8n
+```
+
+## 🚨 Docker Desktop für Windows-Nutzer
+
+### WSL2 Backend nutzen
+- Docker Desktop > Settings > General > "Use WSL 2 based engine"
+- Bessere Performance als Hyper-V
+
+### File Watching Issues
+```bash
+# In WSL2 Terminal, falls Änderungen nicht erkannt werden:
+echo "export DOCKER_BUILDKIT=1" >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Port Konflikte
+```bash
+# Alle verwendeten Ports anzeigen:
+netstat -an | findstr :8080
+```
+
+## 📊 Monitoring & Logs
+
+### Docker Desktop Dashboard nutzen
+1. Docker Desktop öffnen
+2. Containers > landingpage-n8n
+3. Logs und Stats in Echtzeit anzeigen
+
+### Erweiterte Log-Konfiguration
+In `docker-compose.yml` hinzufügen:
+```yaml
+services:
+  nginx:
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+## 🎯 Best Practices
+
+1. **Regelmäßige Updates**
+   ```bash
+   docker compose pull
+   docker compose up -d
+   ```
+
+2. **Backup der n8n Daten**
+   ```bash
+   docker run --rm -v landingpage-n8n_n8n-data:/data -v $(pwd):/backup alpine tar czf /backup/n8n-backup.tar.gz -C /data .
+   ```
+
+3. **Restore n8n Daten**
+   ```bash
+   docker run --rm -v landingpage-n8n_n8n-data:/data -v $(pwd):/backup alpine tar xzf /backup/n8n-backup.tar.gz -C /data
+   ```
+
+## 🌐 Produktions-Deployment
+
+Für Produktionsumgebungen:
+
+```yaml
+# SSL/TLS mit Traefik oder nginx-proxy
+# Umgebungsvariablen für Secrets
+# Resource Limits setzen
+# Health Checks aktivieren
+```
 
 ## 🤝 Beitragen
 
-Pull Requests sind willkommen! Für größere Änderungen bitte zuerst ein Issue öffnen.
-
 1. Fork das Repository
-2. Feature Branch erstellen (`git checkout -b feature/AmazingFeature`)
-3. Änderungen committen (`git commit -m 'Add some AmazingFeature'`)
-4. Branch pushen (`git push origin feature/AmazingFeature`)
-5. Pull Request öffnen
+2. Feature Branch erstellen
+3. Änderungen testen mit Docker Compose
+4. Pull Request öffnen
 
 ## 📝 Lizenz
 
 MIT License - siehe [LICENSE](LICENSE) für Details.
 
-## 🙏 Credits
-
-- **n8n**: [https://n8n.io](https://n8n.io)
-- **Fonts**: Google Fonts (Orbitron, Roboto)
-- **Icons**: Emoji Icons
-
-## 📧 Kontakt
-
-Bei Fragen oder Problemen:
-
-- **GitHub Issues**: [https://github.com/flowgrammer420/landingpage-n8n/issues](https://github.com/flowgrammer420/landingpage-n8n/issues)
-- **Email**: Über Kontaktformular auf der Landing Page
-
 ---
 
-**Viel Spaß mit der n8n Landing Page! 🚀✨**
+**Mit Docker Desktop wird's einfach! 🐳✨**
+
+Jetzt einfach `docker compose up -d` ausführen und loslegen!prte
