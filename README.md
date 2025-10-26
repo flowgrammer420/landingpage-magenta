@@ -4,21 +4,7 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 
 ## ✨ Features
 
-### 🧭 Navigation (NEU!)
-
-- **Konsistentes Navigationsmenü** auf allen Seiten
-- **Drei Hauptmenüpunkte**:
-  - **Home**: Führt zur Landing Page (index.html)
-  - **🔌 Netzwerk Editor**: Öffnet den interaktiven Netzwerk-Topologie Editor (feature.html)
-  - **Admin Bereich**: Öffnet n8n in neuem Tab (target="_blank" auf /n8n/)
-- **Responsive Navigation**: Passt sich automatisch an Bildschirmgröße an
-  - Desktop: Horizontale Menüleiste
-  - Tablet/Mobile: Vertikales Menü mit voller Breite
-- **Neon-Design**: Passend zum Gesamtdesign mit #39ff14 Farbe und Glow-Effekten
-- **Echte Seitenverlinkung**: Keine Hash-Links mehr, saubere Navigation zwischen Seiten
-
 ### 🐳 Docker Integration
-
 - **Ein-Befehl-Deployment**: `docker compose up -d` startet alles
 - **Nginx Reverse Proxy** auf Port 8080: Statische Landing Page und n8n hinter `/n8n/`
 - **n8n AI Starter Kit Ready**: Mit Postgres und Qdrant für AI-Workflows
@@ -31,7 +17,6 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 - **Optimierte Nginx-Konfiguration**: Gzip, Caching, WebSocket Support
 
 ### 🎨 Design & UI
-
 - **Neon-inspiriertes Design** mit leuchtenden Effekten
 - **Dark/Light Mode Toggle** mit persistenter Speicherung
 - **3D-Flip-Animation**: Smooth Übergang zwischen Landing Page und n8n
@@ -40,224 +25,176 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 - **Animierter GIF-Hintergrund**: Dynamischer visueller Effekt mit dunklem Overlay für bessere Lesbarkeit
 
 ### 🔌 Netzwerk-Topologie Editor
-
 - **Interaktiver Netzwerk-Editor** mit Drag & Drop
-- **Konva.js Canvas** für leistungsstarke Visualisierung
-- **4 vordefinierte Gerätetypen**: PC 💻, Server 🖥️, Switch 🔀, Router 📡
-- **Echtzeit-Verbindungen** zwischen Geräten per einfachem Linksklick (kein Shift nötig)
-- **Individuelle Beschriftung** per Doppelklick
-- **PNG Export** für Dokumentation
+- **Cytoscape.js** für leistungsstarke Visualisierung
+- **Echtzeit-Verbindungen** zwischen Nodes per einfachem Linksklick
 - **Neon-Design** passend zur Landing Page (Verbindungen in #39ff14 mit Glow)
 - **Responsive & Touch-optimiert**
+- **JSON Export/Import** für Topologie-Speicherung
 
 ## 📁 Projektstruktur
 
 ```
 landingpage-n8n/
 │
-├── index.html              # Landing Page mit Navigation
-├── feature.html            # Netzwerk-Topologie Editor mit Navigation
+├── index.html              # Landing Page
+├── feature.html            # Netzwerk-Topologie Editor  
 ├── README.md               # Diese Dokumentation
-├── assets/                 # Statische Assets
-│   ├── nav.html            # Modulare Navigation (NEU!)
-│   ├── css/style.css       # Styling inkl. 3D-Flip & Themes
-│   └── js/script.js        # JavaScript für Flip & Theme Toggle
-└── backend/                # Docker Infrastructure
-    ├── docker-compose.yml  # Container-Orchestrierung (nginx, n8n, postgres, qdrant)
-    └── nginx/nginx.conf    # Nginx Reverse Proxy Konfiguration
+│
+├── assets/
+│   ├── css/
+│   │   └── style.css       # Hauptstyles
+│   └── js/
+│       └── script.js       # Hauptskript (Contact Form, Theme Toggle)
+│
+└── backend/
+    ├── docker-compose.yml  # Vollständige Container-Orchestrierung
+    └── nginx.conf          # Reverse Proxy Konfiguration
 ```
 
-## 🔄 Modulare Navigation - Pflege & Wartung
+## 🚀 Installation & Start
 
-### Konzept
+### Voraussetzungen
+- Docker & Docker Compose installiert
+- Port 8080, 5680 und 6333 verfügbar
 
-Die Navigation ist jetzt **modular** aufgebaut. Das bedeutet:
-- Das HTML-Menü ist nur einmal in `assets/nav.html` definiert
-- Alle Seiten laden dieses Menü **dynamisch per JavaScript**
-- Änderungen am Menü müssen nur an **einer Stelle** vorgenommen werden
+### Schnellstart
 
-### Implementierung
+```bash
+# Repository klonen
+git clone <repo-url>
+cd landingpage-n8n/backend
 
-In `index.html` und `feature.html` befindet sich direkt am Anfang von `<body>`:
+# Container starten
+docker compose up -d
 
-```html
-<body>
-  <!-- Navigation Placeholder -->
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('assets/nav.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('nav-placeholder').innerHTML = data;
-      });
-  </script>
-  
-  <!-- Restlicher Seiteninhalt -->
+# Logs anschauen (optional)
+docker compose logs -f
 ```
 
-### Navigation bearbeiten
+### Zugriff
 
-Um das Menü zu ändern, editiere **nur** die Datei `assets/nav.html`:
-
-```html
-<nav id="main-navigation">
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="https://n8n.flowgrammer420.de" target="_blank">Netzwerk Editor</a></li>
-    <li><a href="/admin" target="_blank">Admin Bereich</a></li>
-  </ul>
-</nav>
-```
-
-#### Neue Menüpunkte hinzufügen
-
-Füge einfach weitere `<li><a>`-Elemente in die `<ul>` ein:
-
-```html
-<nav id="main-navigation">
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="feature.html">🔌 Netzwerk Editor</a></li>
-    <li><a href="/n8n/" target="_blank">Admin Bereich</a></li>
-    <!-- Neuer Menüpunkt -->
-    <li><a href="docs.html">📚 Dokumentation</a></li>
-  </ul>
-</nav>
-```
-
-#### Externe Links
-
-Für externe Links oder Links, die in neuem Tab öffnen sollen, verwende `target="_blank"`:
-
-```html
-<li><a href="https://docs.n8n.io" target="_blank">n8n Docs</a></li>
-```
-
-### Styling der Navigation
-
-Das Styling wird über die `<style>`-Tags in `index.html` und `feature.html` gesteuert:
-
-- **Responsive Design**: Automatische Anpassung für Mobile/Tablet/Desktop
-- **Neon-Effekte**: Farbe #39ff14 mit Glow-Schatten
-- **Hover-Effekte**: Grüner Hintergrund beim Überfahren
-
-Änderungen am Styling sollten in beiden Dateien synchron gehalten werden.
-
-### Vorteile der modularen Navigation
-
-✅ **Zentrale Pflege**: Menü nur an einer Stelle ändern  
-✅ **Konsistenz**: Alle Seiten haben identisches Menü  
-✅ **Einfache Erweiterung**: Neue Seiten binden Navigation automatisch ein  
-✅ **Wartbarkeit**: Kein Copy-Paste zwischen Seiten nötig  
-
-### Neue Seiten hinzufügen
-
-Wenn du eine neue Seite erstellst, füge einfach diese Zeilen am Anfang von `<body>` ein:
-
-```html
-<body>
-  <!-- Navigation Placeholder -->
-  <div id="nav-placeholder"></div>
-  <script>
-    fetch('assets/nav.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('nav-placeholder').innerHTML = data;
-      });
-  </script>
-  
-  <!-- Dein Seiteninhalt -->
-```
-
-Damit ist die Navigation automatisch verfügbar!
-
-## 🚀 Schnellstart
-
-1. **Repository klonen**:
-   ```bash
-   git clone https://github.com/flowgrammer420/landingpage-n8n.git
-   cd landingpage-n8n
-   ```
-
-2. **Docker Container starten**:
-   ```bash
-   cd backend
-   docker compose up -d
-   ```
-
-3. **Fertig! Öffne im Browser**:
-   - Landing Page: http://localhost:8080
-   - Netzwerk Editor: http://localhost:8080/feature.html
-   - n8n direkt: http://localhost:8080/n8n/
-
-## 🧭 Navigation & Bedienung
-
-### Hauptnavigation
-
-Das Navigationsmenü ist auf allen Seiten (index.html und feature.html) verfügbar:
-
-1. **Home** - Kehrt zur Startseite zurück
-2. **🔌 Netzwerk Editor** - Wechselt zum interaktiven Netzwerk-Topologie Editor
-3. **Admin Bereich** - Öffnet n8n in einem neuen Browser-Tab
-
-### Landing Page (index.html)
-
-- **Theme Toggle**: Wechsel zwischen Dark und Light Mode (oben rechts)
-- **Kontaktformular**: Sende Anfragen direkt von der Landing Page
-- Über das Navigationsmenü erreichbar: Netzwerk Editor und n8n Admin Bereich
-
-### Netzwerk-Topologie Editor (feature.html)
-
-- **Geräte hinzufügen**: Klicke auf Router, Switch, PC oder Server Buttons
-- **Verbindungen erstellen**: Klicke nacheinander auf zwei Geräte (einfacher Linksklick)
-- **Geräte verschieben**: Drag & Drop auf der Canvas
-- **Export**: Klicke auf "Exportieren" um PNG zu speichern
-- **Leeren**: "Leeren" Button entfernt alle Geräte und Verbindungen
-- Navigation zum Home oder Admin Bereich über das Menü
-
-### n8n Admin Bereich
-
-- Öffnet sich in neuem Tab über das Navigationsmenü
-- Vollständiger Zugriff auf n8n Workflow-Editor
-- Läuft unter `/n8n/` via Nginx Reverse Proxy
+- **Landing Page**: http://localhost:8080
+- **n8n**: http://localhost:8080/n8n/ (oder direkt http://localhost:5680)
+- **Qdrant Dashboard**: http://localhost:6333/dashboard
 
 ## 🔧 Konfiguration
 
-### Ports anpassen
+### Umgebungsvariablen (docker-compose.yml)
 
-In `backend/docker-compose.yml`:
-
-```yaml
-nginx:
-  ports:
-    - "8080:80"  # Ändere 8080 auf deinen Wunsch-Port
-```
-
-### n8n Umgebungsvariablen
-
-In `backend/docker-compose.yml` unter `n8n` Service:
-
+Wichtige n8n Variablen:
 ```yaml
 N8N_HOST: localhost
 N8N_PORT: 5678
-N8N_PROTOCOL: http
-WEBHOOK_URL: http://localhost:8080/
+N8N_PATH: /n8n/
+WEBHOOK_URL: http://localhost:8080/n8n/
+N8N_EDITOR_BASE_URL: http://localhost:8080/n8n/
 ```
 
-## 📝 Weitere Dokumentation
+### Nginx Konfiguration
 
-- [n8n Dokumentation](https://docs.n8n.io/)
-- [Docker Compose Dokumentation](https://docs.docker.com/compose/)
-- [Nginx Reverse Proxy Guide](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
+- **Root**: `/usr/share/nginx/html` (Volume: `../:/usr/share/nginx/html:ro`)
+- **n8n Proxy**: `/n8n/` → `http://n8n:5678`
+- **Gzip**: Aktiviert für bessere Performance
+- **WebSocket**: Unterstützung für n8n Live-Updates
+
+## 📊 Container-Übersicht
+
+| Container | Port(s) | Beschreibung |
+|-----------|---------|-------------|
+| nginx | 8080 | Reverse Proxy & Statische Dateien |
+| n8n | 5680 | Workflow Automation |
+| postgres | 5432 | Datenbank für n8n |
+| qdrant | 6333 | Vector Database für AI |
+
+## 🛠️ Entwicklung
+
+### Lokale Änderungen testen
+
+Da das Root-Verzeichnis als Volume gemountet ist, werden Änderungen sofort wirksam:
+
+```bash
+# HTML/CSS/JS bearbeiten
+vim index.html
+
+# Browser neu laden - Änderungen sind sofort sichtbar!
+```
+
+### Container neu starten
+
+```bash
+cd backend
+docker compose restart
+```
+
+### Container stoppen
+
+```bash
+cd backend
+docker compose down
+
+# Mit Volumen löschen (ACHTUNG: Alle Daten gehen verloren!)
+docker compose down -v
+```
+
+## 🎯 n8n AI Starter Kit
+
+Dieses Setup ist vollständig kompatibel mit dem [n8n AI Starter Kit](https://github.com/n8n-io/n8n-ai-starter-kit):
+
+- ✅ Postgres als Datenbank
+- ✅ Qdrant für Vector Embeddings
+- ✅ Optimierte Umgebungsvariablen
+
+### AI Workflow Beispiel
+
+1. n8n öffnen: http://localhost:8080/n8n/
+2. Neuen Workflow erstellen
+3. Qdrant Node hinzufügen
+   - Host: `qdrant`
+   - Port: `6333`
+4. AI Agent Node mit deinem LLM konfigurieren
+
+## 📝 Wichtige Hinweise
+
+### Production Deployment
+
+Für Produktion solltest du:
+
+1. **Sichere Passwörter** in `docker-compose.yml` setzen
+2. **HTTPS** mit Let's Encrypt einrichten
+3. **N8N_HOST** auf deine Domain ändern
+4. **WEBHOOK_URL** und **N8N_EDITOR_BASE_URL** entsprechend anpassen
+
+### Troubleshooting
+
+**Problem**: n8n lädt nicht
+- Überprüfe ob alle Container laufen: `docker compose ps`
+- Checke n8n Logs: `docker compose logs n8n`
+- Stelle sicher dass Port 5680 nicht belegt ist
+
+**Problem**: Reverse Proxy Fehler
+- Nginx Logs prüfen: `docker compose logs nginx`
+- Stelle sicher dass n8n vor nginx startet (depends_on in docker-compose.yml)
+
+**Problem**: Qdrant verbindet nicht
+- Checke ob Container läuft: `docker compose ps qdrant`
+- Prüfe Port 6333: `curl http://localhost:6333`
 
 ## 🤝 Contributing
 
-Contributions sind willkommen! Bitte erstelle ein Issue oder Pull Request.
+Pull Requests sind willkommen! Für größere Änderungen bitte zuerst ein Issue erstellen.
 
 ## 📄 Lizenz
 
 MIT License - siehe LICENSE Datei für Details
 
+## 🙏 Credits
+
+- [n8n](https://n8n.io/) - Workflow Automation
+- [Qdrant](https://qdrant.tech/) - Vector Database
+- [Nginx](https://nginx.org/) - Reverse Proxy
+- [Cytoscape.js](https://js.cytoscape.org/) - Network Topology Visualization
+
 ---
 
-**Viel Spaß mit deiner n8n Landing Page! 🚀**
+**Made with ❤️ and ⚡ by the n8n Community**
