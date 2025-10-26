@@ -22,6 +22,58 @@
       background: rgba(0,0,0,0.7); z-index: -1;
     }
     body { background: transparent; position: relative; }
+
+    /* Responsive Navigation Menu Styles */
+    nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 20px 10px;
+        background: rgba(0, 0, 0, 0.8);
+        border-bottom: 2px solid #39ff14;
+    }
+
+    nav a {
+        color: #39ff14;
+        text-decoration: none;
+        padding: 10px 20px;
+        border: 2px solid #39ff14;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        white-space: nowrap;
+    }
+
+    nav a:hover {
+        background: #39ff14;
+        color: #000;
+        box-shadow: 0 0 15px #39ff14;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        nav {
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px 10px;
+        }
+        
+        nav a {
+            width: 90%;
+            text-align: center;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        nav a {
+            padding: 8px 15px;
+            font-size: 13px;
+        }
+    }
+
     .topology-container { display:flex; flex-direction:column; min-height:100vh; background:transparent; }
     .topology-header { padding:20px; background: rgba(0,0,0,0.5); border-bottom:2px solid #39ff14; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
     .topology-header h1 { color:#39ff14; text-shadow:0 0 20px #39ff14; margin:0; font-size:1.8rem; }
@@ -34,6 +86,13 @@
   <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 </head>
 <body>
+  <!-- Navigation Menu -->
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="feature.html">🔌 Netzwerk Editor</a>
+    <a href="/n8n/" target="_blank">Admin Bereich</a>
+  </nav>
+
   <div class="topology-container">
     <header class="topology-header">
       <h1>Netzwerk-Topologie Editor</h1>
@@ -51,53 +110,36 @@
     </div>
     <div id="stage-wrapper" style="flex:1; min-height:60vh;"></div>
   </div>
-
   <script>
     const wrapper = document.getElementById('stage-wrapper');
     const stage = new Konva.Stage({ container: 'stage-wrapper', width: wrapper.clientWidth, height: Math.max(600, window.innerHeight * 0.7) });
     const layer = new Konva.Layer();
     stage.add(layer);
-
     let connections = [];
     let nodes = [];
     let pendingDevice = null; // stores first clicked device for simple left-click connect
-
     function createDevice(type, x, y) {
       const group = new Konva.Group({ x, y, draggable: true });
-
       const base = new Konva.Rect({ width: 80, height: 50, fill: 'rgba(0,0,0,0.6)', stroke: '#39ff14', strokeWidth: 2, cornerRadius: 8, shadowColor: '#39ff14', shadowBlur: 8, shadowOpacity: 0.8 });
       const label = new Konva.Text({ text: type.toUpperCase(), fontSize: 14, fill: '#39ff14', align: 'center', width: 80, y: 16, shadowColor: '#39ff14', shadowBlur: 6, shadowOpacity: 0.7 });
-
       group.add(base); group.add(label);
       layer.add(group); layer.draw();
-
       // Simple left-click connection logic (Shift key removed)
       group.on('click', () => {
         if (!pendingDevice) {
           pendingDevice = group;
-          base.stroke('#00ff88'); layer.draw();
-        } else if (pendingDevice && pendingDevice !== group) {
+          base.stroke('#ff6600'); base.strokeWidth(3); layer.draw();
+        } else if (pendingDevice !== group) {
           createConnection(pendingDevice, group);
-          // reset highlight
-          const prevRect = pendingDevice.findOne('Rect');
-          if (prevRect) prevRect.stroke('#39ff14');
+          pendingDevice.getChildren()[0].stroke('#39ff14'); pendingDevice.getChildren()[0].strokeWidth(2);
           pendingDevice = null;
-          base.stroke('#39ff14');
           layer.draw();
-        } else {
-          // clicked same device again -> cancel selection
-          const prevRect = pendingDevice.findOne('Rect');
-          if (prevRect) prevRect.stroke('#39ff14');
-          pendingDevice = null; layer.draw();
         }
       });
-
       group.on('dragmove', updateConnections);
-
       nodes.push(group);
       return group;
     }
-
     function createConnection(device1, device2) {
       const line = new Konva.Line({
         points: [device1.x(), device1.y(), device2.x(), device2.y()],
@@ -110,20 +152,17 @@
         lineCap: 'round',
         lineJoin: 'round'
       });
-
       connections.push({ line, device1, device2 });
       layer.add(line);
       line.moveToBottom();
       layer.draw();
     }
-
     function updateConnections() {
       connections.forEach(conn => {
         conn.line.points([conn.device1.x(), conn.device1.y(), conn.device2.x(), conn.device2.y()]);
       });
       layer.draw();
     }
-
     // Palette add
     document.querySelectorAll('.device-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -131,7 +170,6 @@
         createDevice(type, 150 + Math.random() * 200, 150 + Math.random() * 200);
       });
     });
-
     // Clear
     document.getElementById('clear-btn').addEventListener('click', () => {
       if (confirm('Alle Geräte und Verbindungen löschen?')) {
@@ -140,7 +178,6 @@
         layer.draw();
       }
     });
-
     // Export
     document.getElementById('export-btn').addEventListener('click', () => {
       const dataURL = stage.toDataURL({ pixelRatio: 2 });
@@ -148,7 +185,6 @@
       link.download = 'netzwerk-topologie.png';
       link.href = dataURL; document.body.appendChild(link); link.click(); document.body.removeChild(link);
     });
-
     // Example topology
     setTimeout(() => {
       const r = createDevice('router', 400, 200);
@@ -163,7 +199,6 @@
       createConnection(s1, pc2);
       createConnection(s2, srv);
     }, 100);
-
     window.addEventListener('resize', () => {
       stage.size({ width: wrapper.clientWidth, height: Math.max(600, window.innerHeight * 0.7) });
       updateConnections();
