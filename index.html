@@ -7,7 +7,6 @@
     <title>n8n Landingpage - Neon Darkmode</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap">
-    
     <style>
         /* Three.js Canvas Background Styling */
         #threejs-canvas {
@@ -83,7 +82,8 @@
             }
         }
     </style>
-    
+</head>
+<body>
     <!-- Three.js Library -->
     <script type="importmap">
         {
@@ -93,8 +93,7 @@
             }
         }
     </script>
-</head>
-<body>
+
     <!-- Three.js Canvas for 3D Background -->
     <canvas id="threejs-canvas"></canvas>
     
@@ -111,11 +110,12 @@
         <p style="font-size: 1.5em; color: #fff;">Automate Workflows im Neon-Style!</p>
     </main>
     
-    <!-- Three.js 3D Background Script -->
+    <!-- Three.js 3D Background Script with OrbitControls -->
     <script type="module">
         import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         
-        let camera, scene, renderer;
+        let camera, scene, renderer, controls;
         let mesh;
         
         init();
@@ -202,6 +202,15 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             
+            // OrbitControls - Enable mouse zoom & rotation with damping
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 5;
+            controls.maxDistance = 100;
+            controls.maxPolarAngle = Math.PI / 1.5;
+            
             // Handle window resize
             window.addEventListener('resize', onWindowResize);
         }
@@ -221,11 +230,8 @@
                 mesh.rotation.y += 0.01;
             }
             
-            // Animate camera position slightly
-            const time = Date.now() * 0.0001;
-            camera.position.x = Math.sin(time) * 5;
-            camera.position.z = 20 + Math.cos(time) * 5;
-            camera.lookAt(0, 5, 0);
+            // Update controls for smooth damping
+            controls.update();
             
             renderer.render(scene, camera);
         }
