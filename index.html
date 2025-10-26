@@ -76,77 +76,63 @@
             }
             
             nav a {
-                width: 90%;
+                width: 100%;
                 text-align: center;
                 font-size: 14px;
-            }
-        }
-        @media (max-width: 480px) {
-            nav a {
-                padding: 8px 15px;
-                font-size: 13px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Placeholder -->
-    <div id="nav-placeholder"></div>
-    <script>
-        fetch('assets/nav.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('nav-placeholder').innerHTML = data;
-            });
-    </script>
+    <!-- Embedded Navigation Menu -->
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="feature.html">🔌 Netzwerk Editor</a>
+        <a href="/n8n/" target="_blank">Admin Bereich</a>
+    </nav>
 
-    <!-- Flip Container -->
-    <div class="flip-container" id="flip-container">
-        <!-- Front Side (Landing Page) -->
-        <div class="flip-box-front">
-            <!-- Theme Toggle Switch -->
-            <div class="theme-toggle-wrapper">
-                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light mode">
-                    <span class="toggle-icon">☀️</span>
-                    <span class="toggle-text">Light Mode</span>
-                </button>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <h1>🚀 n8n Landing</h1>
+        <p>Automate Workflows. Im Neon-Style.</p>
+        <a href="#features" class="cta-button">Features entdecken</a>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2>Was wir bieten</h2>
+        <div class="feature-cards">
+            <div class="card">
+                <h3>⚡ Schnelle Automation</h3>
+                <p>Erstelle Workflows in Minuten statt Stunden.</p>
             </div>
-            
-            <div class="container">
-                <h1>n8n Landing</h1>
-                <p>Automate Workflows im Neon-Style!</p>
-                <form id="contactForm" action="#" method="POST">
-                    <label for="name">Name *</label>
-                    <input type="text" id="name" name="name" required>
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required>
-                    <label for="msg">Nachricht *</label>
-                    <textarea id="msg" name="message" rows="5" required></textarea>
-                    <button type="submit">Absenden</button>
-                </form>
-                <div id="response-message" style="display: none; margin-top: 20px; color: #39ff14;"></div>
+            <div class="card">
+                <h3>🔐 Sicher & Privat</h3>
+                <p>Deine Daten bleiben bei dir – selbstgehostet.</p>
+            </div>
+            <div class="card">
+                <h3>🔌 Viele Integrationen</h3>
+                <p>Verbinde über 400+ Apps ohne Code.</p>
             </div>
         </div>
-        
-        <!-- Back Side (n8n iframe) -->
-        <div class="flip-box-back">
-            <div class="back-header">
-                <button id="back-button" class="back-button" aria-label="Zurück zur Landingpage">
-                    ← Zurück
-                </button>
-                <h2>n8n Admin Panel</h2>
-            </div>
-            <div class="iframe-container">
-                <iframe 
-                        src="/n8n/" 
-                        title="n8n Workflow Automation" 
-                        id="n8n-iframe"
-                        frameborder="0" 
-                        allowfullscreen>
-                </iframe>
-            </div>
-        </div>
-    </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <h2>Kontakt</h2>
+        <form id="contact-form">
+            <input type="text" id="name" placeholder="Name" required />
+            <input type="email" id="email" placeholder="E-Mail" required />
+            <textarea id="message" placeholder="Deine Nachricht" required></textarea>
+            <button type="submit">Senden</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 n8n Landingpage | Powered by n8n</p>
+    </footer>
+
     <script src="assets/js/script.js"></script>
 </body>
 </html>
