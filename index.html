@@ -1,252 +1,281 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowgrammer420 - Admin Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="n8n Landing - Automate Workflows im Neon-Style!" />
+  <title>n8n Landingpage - Neon Darkmode</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" />
 
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #1a1a1a;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --neon-magenta: #ff00ff;
-            --neon-cyan: #00ffff;
-            --neon-pink: #ff0080;
-            --shadow-glow: 0 0 20px rgba(255, 0, 255, 0.5);
-        }
+  <style>
+    /* Three.js Canvas Background Styling */
+    #threejs-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: #000;
+    }
+    /* Dark overlay for better contrast */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: -1;
+      pointer-events: none;
+    }
+    /* Ensure body is transparent to show background */
+    body {
+      margin: 0;
+      background: transparent;
+      position: relative;
+      overflow-x: hidden;
+      transition: opacity 0.6s ease-in-out; /* remove transform-based rotation to avoid mirroring */
+    }
+    /* Light mode styles */
+    body.light-mode { background: #f0f0f0; }
+    body.light-mode::after { background: rgba(255, 255, 255, 0.7); }
+    body.light-mode nav { background: rgba(255, 255, 255, 0.9) !important; border-bottom: 2px solid #00CED1 !important; }
+    body.light-mode nav a,
+    body.light-mode nav button { color: #00CED1 !important; border-color: #00CED1 !important; }
+    body.light-mode nav a:hover,
+    body.light-mode nav button:hover { background: #00CED1 !important; color: #fff !important; box-shadow: 0 0 15px #00CED1 !important; }
+    body.light-mode main h1 { color: #00CED1 !important; text-shadow: 0 0 10px #00CED1 !important; }
+    body.light-mode main p { color: #333 !important; }
 
-        [data-theme="light"] {
-            --bg-primary: #f5f5f5;
-            --bg-secondary: #ffffff;
-            --text-primary: #1a1a1a;
-            --text-secondary: #4a4a4a;
-            --neon-magenta: #d400d4;
-            --neon-cyan: #00b8b8;
-            --neon-pink: #d40060;
-            --shadow-glow: 0 0 15px rgba(212, 0, 212, 0.3);
-        }
+    /* Remove rotateY animations entirely to prevent mirrored content */
+    /* Previously defined rotateYIn/rotateYOut and .rotating-* classes removed */
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-        }
+    /* Responsive Navigation Menu Styles */
+    nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 20px 10px;
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 2px solid #FF0080;
+    }
+    nav a, nav button {
+      color: #FF0080;
+      text-decoration: none;
+      padding: 10px 20px;
+      border: 2px solid #FF0080;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      white-space: nowrap;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+    }
+    nav a:hover, nav button:hover { background: #FF0080; color: #000; box-shadow: 0 0 15px #FF0080; }
+    #theme-toggle { background: #FFD700; color: #000; border-color: #FFD700; }
+    #theme-toggle:hover { box-shadow: 0 0 15px #FFD700; }
+    @media (max-width: 768px) { nav { flex-direction: column; gap: 10px; } nav a, nav button { width: 80%; text-align: center; } }
 
-        header {
-            background: var(--bg-secondary);
-            padding: 1.5rem 2rem;
-            box-shadow: var(--shadow-glow);
-            border-bottom: 2px solid var(--neon-magenta);
-        }
+    .container { position: relative; z-index: 1; padding: 40px 20px; color: #FF0080; font-family: 'Orbitron', sans-serif; text-align: center; }
+    #landing-container { display: block; }
+    #n8n-container { display: none; }
+    #n8n-frame {
+      width: 100%;
+      height: calc(100vh - 180px);
+      border: none;
+      box-shadow: 0 0 20px rgba(0,255,255,0.25), 0 0 20px rgba(255,0,128,0.25) inset;
+      border-radius: 8px;
+      transform-origin: top center; /* for future scaling if needed */
+    }
+    #back-btn { display: none; }
 
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* Slider container styling */
+    .resize-controls { display: none; gap: 12px; align-items: center; justify-content: center; margin: 12px auto 20px; color: #00FFFF; }
+    .resize-controls input[type="range"] { width: min(800px, 90vw); }
+    .resize-controls .value { min-width: 56px; text-align: left; color: #00FFFF; }
+  </style>
 
-        h1 {
-            font-size: 2rem;
-            background: linear-gradient(90deg, var(--neon-magenta), var(--neon-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
-        }
-
-        .theme-toggle {
-            background: var(--bg-primary);
-            border: 2px solid var(--neon-magenta);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .theme-toggle:hover {
-            background: var(--neon-magenta);
-            transform: scale(1.05);
-        }
-
-        .container {
-            flex: 1;
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            width: 100%;
-        }
-
-        .admin-panel {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-glow);
-            border: 2px solid var(--neon-cyan);
-        }
-
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .controls label {
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        .controls input[type="range"] {
-            flex: 1;
-            height: 6px;
-            background: var(--bg-primary);
-            border-radius: 3px;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .controls input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--neon-magenta);
-            cursor: pointer;
-            border-radius: 50%;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .controls input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: var(--neon-magenta);
-            cursor: pointer;
-            border-radius: 50%;
-            box-shadow: var(--shadow-glow);
-            border: none;
-        }
-
-        .controls span {
-            min-width: 60px;
-            text-align: right;
-            color: var(--neon-cyan);
-            font-weight: bold;
-        }
-
-        .iframe-container {
-            background: var(--bg-primary);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid var(--neon-pink);
-            box-shadow: var(--shadow-glow);
-        }
-
-        iframe {
-            width: 100%;
-            border: none;
-            display: block;
-        }
-
-        footer {
-            background: var(--bg-secondary);
-            padding: 1rem 2rem;
-            text-align: center;
-            color: var(--text-secondary);
-            border-top: 2px solid var(--neon-cyan);
-        }
-
-        @media (max-width: 768px) {
-            header {
-                padding: 1rem;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            .container {
-                margin: 1rem auto;
-                padding: 0 1rem;
-            }
-
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .controls span {
-                text-align: left;
-            }
-        }
-    </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <h1>🚀 Flowgrammer420 Admin</h1>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
-        </div>
-    </header>
+  <canvas id="threejs-canvas"></canvas>
 
-    <div class="container">
-        <div class="admin-panel">
-            <div class="controls">
-                <label for="height-slider">📏 Höhe:</label>
-                <input type="range" id="height-slider" min="300" max="1200" value="800" step="50">
-                <span id="height-value">800px</span>
-            </div>
-            <div class="iframe-container">
-                <iframe id="admin-iframe" src="https://n8n.flowgrammer420.com" height="800"></iframe>
-            </div>
-        </div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="feature.html">Netzwerkeditor</a>
+    <button id="admin-btn">Admin-Bereich</button>
+    <button id="theme-toggle">🌙 Dark/Light Mode</button>
+    <button id="back-btn">⬅️ Zurück</button>
+  </nav>
+
+  <main class="container" id="landing-container">
+    <h1 style="font-size: 3em; margin-bottom: 20px; text-shadow: 0 0 10px #FF0080;">n8n Landingpage</h1>
+    <p style="font-size: 1.5em; color: #fff;">Automate Workflows im Neon-Style!</p>
+  </main>
+
+  <main class="container" id="n8n-container">
+    <h2 style="color:#00FFFF; text-shadow: 0 0 10px #00FFFF; margin-bottom: 16px;">n8n Admin</h2>
+    <div class="resize-controls" id="resize-controls">
+      <label for="iframe-size">Fensterhöhe:</label>
+      <input type="range" id="iframe-size" min="400" max="1200" step="20" value="800" />
+      <span class="value" id="iframe-size-value">800px</span>
     </div>
+    <iframe id="n8n-frame" src="/n8n/"></iframe>
+  </main>
 
-    <footer>
-        <p>&copy; 2025 Flowgrammer420 | Neon Style Dashboard</p>
-    </footer>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    <script>
-        // Theme Toggle
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
+    let camera, scene, renderer, controls;
+    let mesh;
+    init();
+    animate();
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        if (savedTheme === 'light') {
-            document.body.setAttribute('data-theme', 'light');
-        }
+    function init() {
+      const canvas = document.getElementById('threejs-canvas');
 
-        // Height Slider Control
-        const heightSlider = document.getElementById('height-slider');
-        const heightValue = document.getElementById('height-value');
-        const iframe = document.getElementById('admin-iframe');
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+      camera.position.set(0, 10, 20);
+      camera.lookAt(0, 0, 0);
 
-        heightSlider.addEventListener('input', function() {
-            const height = this.value;
-            iframe.style.height = height + 'px';
-            heightValue.textContent = height + 'px';
-        });
-    </script>
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+      scene.fog = new THREE.Fog(0x000000, 10, 50);
+
+      const ambientLight = new THREE.AmbientLight(0xFF0080, 0.3);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xFF0080, 1);
+      directionalLight.position.set(5, 10, 7.5);
+      scene.add(directionalLight);
+      const pointLight = new THREE.PointLight(0x00FFFF, 1, 100);
+      pointLight.position.set(0, 5, 0);
+      scene.add(pointLight);
+
+      const gridHelper = new THREE.GridHelper(50, 50, 0xFF0080, 0x00FFFF);
+      scene.add(gridHelper);
+      const axesHelper = new THREE.AxesHelper(10);
+      scene.add(axesHelper);
+      const polarGridHelper = new THREE.PolarGridHelper(10, 16, 8, 64, 0xFF0080, 0x00FFFF);
+      polarGridHelper.position.y = 0.1;
+      scene.add(polarGridHelper);
+
+      const geometry = new THREE.TorusKnotGeometry(3, 1, 128, 16);
+      const material = new THREE.MeshStandardMaterial({ color: 0xFF0080, roughness: 0.3, metalness: 0.8, wireframe: false });
+      mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(0, 5, 0);
+      scene.add(mesh);
+
+      const wireframeGeometry = new THREE.TorusKnotGeometry(3, 1, 128, 16);
+      const wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0x00FFFF, wireframe: true, transparent: true, opacity: 0.3 });
+      const wireframeMesh = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+      mesh.add(wireframeMesh);
+
+      const boxHelper = new THREE.BoxHelper(mesh, 0x00FFFF);
+      scene.add(boxHelper);
+
+      const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+      const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x00FFFF, roughness: 0.4, metalness: 0.6 });
+      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      sphere.position.set(-8, 3, -5);
+      scene.add(sphere);
+
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.screenSpacePanning = false;
+      controls.minDistance = 5;
+      controls.maxDistance = 100;
+      controls.maxPolarAngle = Math.PI / 1.5;
+
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (mesh) {
+        mesh.rotation.x += 0.005;
+        mesh.rotation.y += 0.01;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+  </script>
+
+  <script>
+    // Theme: restore preference
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    if (currentTheme === 'light') document.body.classList.add('light-mode');
+
+    // Theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      document.body.classList.toggle('light-mode');
+      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    });
+
+    const adminBtn = document.getElementById('admin-btn');
+    const backBtn = document.getElementById('back-btn');
+    const landing = document.getElementById('landing-container');
+    const n8n = document.getElementById('n8n-container');
+    const n8nFrame = document.getElementById('n8n-frame');
+    const resizeControls = document.getElementById('resize-controls');
+    const iframeSize = document.getElementById('iframe-size');
+    const iframeSizeValue = document.getElementById('iframe-size-value');
+
+    function showN8N() {
+      // Simply switch visibility without 3D rotate to avoid mirroring
+      landing.style.display = 'none';
+      n8n.style.display = 'block';
+      adminBtn.style.display = 'none';
+      backBtn.style.display = 'inline-block';
+      resizeControls.style.display = 'flex';
+
+      // Apply slider initial value
+      const h = parseInt(iframeSize.value, 10);
+      n8nFrame.style.height = h + 'px';
+      iframeSizeValue.textContent = h + 'px';
+    }
+
+    function showLanding() {
+      n8n.style.display = 'none';
+      landing.style.display = 'block';
+      backBtn.style.display = 'none';
+      adminBtn.style.display = 'inline-block';
+      resizeControls.style.display = 'none';
+    }
+
+    adminBtn.addEventListener('click', function (e) { e.preventDefault(); showN8N(); });
+    backBtn.addEventListener('click', function (e) { e.preventDefault(); showLanding(); });
+
+    // Resize slider behavior
+    iframeSize.addEventListener('input', function () {
+      const h = parseInt(this.value, 10);
+      n8nFrame.style.height = h + 'px';
+      iframeSizeValue.textContent = h + 'px';
+    });
+  </script>
 </body>
 </html>
