@@ -42,325 +42,190 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
   min-height: 100vh;
-  perspective: 2000px;
 }
 
 /* ======================================
-   Flip Container & 3D Flip Effect
+   Container & Layout
 ======================================= */
-.flip-container {
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
   position: relative;
-  width: 100%;
-  min-height: 100vh;
-  transform-style: preserve-3d;
-  transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 1;
 }
 
-.flip-container.flipped {
-  transform: rotateY(180deg);
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  color: var(--neon-glow);
+  text-shadow: 0 0 20px var(--shadow), 0 0 40px var(--shadow);
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
 }
 
-.flip-box-front,
-.flip-box-back {
-  position: absolute;
-  width: 100%;
-  min-height: 100vh;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+@keyframes pulse {
+  0%, 100% { text-shadow: 0 0 20px var(--shadow), 0 0 40px var(--shadow); }
+  50% { text-shadow: 0 0 30px var(--shadow), 0 0 60px var(--shadow); }
 }
 
-.flip-box-front {
-  z-index: 2;
-  transform: rotateY(0deg);
-}
-
-.flip-box-back {
-  transform: rotateY(180deg);
-  background: var(--bg-color);
-  display: flex;
-  flex-direction: column;
+.intro {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  line-height: 1.6;
 }
 
 /* ======================================
-   Back Side (iframe container)
+   Contact Form
 ======================================= */
-.back-header {
-  padding: 15px 30px;
-  background: var(--nav-bg);
+.contact-form {
+  background: var(--form-bg);
+  padding: 30px;
+  border-radius: 12px;
+  margin-top: 40px;
+  border: 2px solid var(--neon-glow);
+  box-shadow: 0 0 30px var(--shadow);
   backdrop-filter: blur(10px);
-  border-bottom: 2px solid var(--neon-glow);
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  box-shadow: 0 2px 20px var(--shadow);
-  z-index: 10;
 }
 
-.back-button {
-  padding: 10px 25px;
-  background: var(--neon-glow);
-  color: var(--bg-color);
+.contact-form h2 {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--neon-glow);
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px var(--shadow);
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  box-shadow: 0 0 15px var(--shadow);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.contact-form button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 15px;
+  background: linear-gradient(135deg, var(--neon-glow) 0%, var(--btn-hover) 100%);
+  color: #000;
   border: none;
-  border-radius: 25px;
+  border-radius: 8px;
+  font-size: 1.1rem;
   font-weight: bold;
-  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 20px var(--shadow);
-  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.back-button:hover {
-  background: var(--btn-hover);
-  transform: translateY(-2px);
+.contact-form button:hover {
+  transform: translateY(-3px);
   box-shadow: 0 5px 25px var(--shadow);
 }
 
-.back-header h2 {
-  color: var(--neon-glow);
-  font-family: 'Orbitron', sans-serif;
-  text-shadow: 0 0 15px var(--shadow);
-  font-size: 1.8rem;
+/* ======================================
+   Notification Messages
+======================================= */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  background: rgba(57, 255, 20, 0.9);
+  color: #000;
+  border-radius: 8px;
+  box-shadow: 0 5px 25px var(--shadow);
+  z-index: 1000;
+  display: none;
+  animation: slideIn 0.3s ease;
 }
 
-.iframe-container {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  background: var(--bg-color);
+.notification.show {
+  display: block;
 }
 
-.iframe-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: var(--bg-color);
+.notification.error {
+  background: rgba(255, 50, 50, 0.9);
+  color: #fff;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* ======================================
    Theme Toggle Button
 ======================================= */
-.theme-toggle-wrapper {
+.theme-toggle {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 1000;
-}
-
-.theme-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-  background: var(--nav-bg);
-  backdrop-filter: blur(10px);
-  border: 2px solid var(--neon-glow);
-  border-radius: 30px;
-  color: var(--text-color);
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 20px var(--shadow);
-  font-family: 'Orbitron', sans-serif;
-}
-
-.theme-toggle-btn:hover {
   background: var(--neon-glow);
-  color: var(--bg-color);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 25px var(--shadow);
-}
-
-.toggle-icon {
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.theme-toggle-btn:hover .toggle-icon {
-  transform: rotate(180deg);
-}
-
-/* ======================================
-   Navigation
-======================================= */
-nav {
-  background: var(--nav-bg);
-  backdrop-filter: blur(10px);
-  padding: 15px 30px;
-  text-align: center;
-  border-bottom: 2px solid var(--neon-glow);
-  box-shadow: 0 2px 20px var(--shadow);
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
-
-nav a {
-  color: var(--neon-glow);
-  text-decoration: none;
-  margin: 0 20px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 10px var(--shadow);
-  font-family: 'Orbitron', sans-serif;
-}
-
-nav a:hover {
-  color: var(--btn-hover);
-  text-shadow: 0 0 20px var(--shadow);
-  transform: translateY(-2px);
-}
-
-.admin-link {
-  padding: 8px 20px;
-  background: var(--neon-glow);
-  color: var(--bg-color);
-  border-radius: 25px;
-  box-shadow: 0 0 15px var(--shadow);
-}
-
-.admin-link:hover {
-  background: var(--btn-hover);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 5px 25px var(--shadow);
-}
-
-/* ======================================
-   Container
-======================================= */
-.container {
-  max-width: 800px;
-  margin: 80px auto;
-  padding: 40px;
-  background: var(--form-bg);
-  border-radius: 15px;
-  box-shadow: 0 0 50px var(--shadow);
-  backdrop-filter: blur(10px);
-  border: 2px solid var(--neon-glow);
-}
-
-h1 {
-  text-align: center;
-  font-size: 3rem;
-  color: var(--neon-glow);
-  text-shadow: 0 0 30px var(--shadow), 0 0 50px var(--shadow);
-  margin-bottom: 20px;
-  font-family: 'Orbitron', sans-serif;
-  animation: neonPulse 2s infinite alternate;
-}
-
-@keyframes neonPulse {
-  0% {
-    text-shadow: 0 0 20px var(--shadow), 0 0 40px var(--shadow);
-  }
-  100% {
-    text-shadow: 0 0 30px var(--shadow), 0 0 60px var(--shadow);
-  }
-}
-
-p {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-bottom: 40px;
-  color: var(--text-color);
-}
-
-/* ======================================
-   Form Styles
-======================================= */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-label {
-  font-weight: bold;
-  color: var(--text-color);
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-input[type="text"],
-input[type="email"],
-textarea {
-  padding: 15px;
-  border: 2px solid var(--input-border);
-  border-radius: 8px;
-  background: var(--input-bg);
-  color: var(--text-color);
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-input:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--btn-hover);
-  box-shadow: 0 0 20px var(--shadow);
-  background: var(--input-bg);
-}
-
-button[type="submit"] {
-  padding: 15px;
-  background: var(--neon-glow);
-  color: var(--bg-color);
+  color: #000;
   border: none;
+  padding: 12px 20px;
   border-radius: 8px;
-  font-size: 1.2rem;
-  font-weight: bold;
   cursor: pointer;
+  font-weight: bold;
+  z-index: 100;
   transition: all 0.3s ease;
   box-shadow: 0 0 20px var(--shadow);
-  font-family: 'Orbitron', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 2px;
 }
 
-button[type="submit"]:hover {
-  background: var(--btn-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px var(--shadow);
+.theme-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px var(--shadow);
 }
 
 /* ======================================
    Responsive Design
 ======================================= */
 @media (max-width: 768px) {
-  .container {
-    margin: 40px 20px;
-    padding: 25px;
-  }
-
   h1 {
     font-size: 2rem;
   }
-
-  nav a {
-    margin: 0 10px;
+  
+  .intro {
+    font-size: 1rem;
+  }
+  
+  .contact-form {
+    padding: 20px;
+  }
+  
+  .theme-toggle {
+    top: 10px;
+    right: 10px;
+    padding: 10px 15px;
     font-size: 0.9rem;
   }
-
-  .theme-toggle-btn {
-    padding: 10px 15px;
-    font-size: 12px;
-  }
-
-  .back-header {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-
-  .back-header h2 {
-    font-size: 1.4rem;
+  
+  .notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    padding: 12px 15px;
   }
 }
 
@@ -368,18 +233,8 @@ button[type="submit"]:hover {
   h1 {
     font-size: 1.5rem;
   }
-
-  nav {
-    padding: 10px;
-  }
-
-  nav a {
-    display: block;
-    margin: 10px 0;
-  }
-
-  .theme-toggle-wrapper {
-    top: 10px;
-    right: 10px;
+  
+  .container {
+    padding: 20px 15px;
   }
 }
