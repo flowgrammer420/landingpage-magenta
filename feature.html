@@ -1,397 +1,173 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netzwerk-Topologie Editor - n8n Landing</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        /* Animated GIF Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://media.giphy.com/media/eg95n5O5SsQ1V4qhsW/giphy.gif');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            z-index: -2;
-        }
-        
-        /* Dark overlay for better contrast */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: -1;
-        }
-        
-        /* Ensure body is transparent to show background */
-        body {
-            background: transparent;
-            position: relative;
-        }
-        
-        .topology-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background: transparent;
-        }
-        
-        .topology-header {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border-bottom: 2px solid #39ff14;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .topology-header h1 {
-            color: #39ff14;
-            text-shadow: 0 0 20px #39ff14;
-            margin: 0;
-            font-size: 1.8rem;
-        }
-        
-        .topology-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .topology-btn {
-            background: linear-gradient(135deg, #39ff14 0%, #00ff88 100%);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
-        }
-        
-        .topology-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(57, 255, 20, 0.8);
-        }
-        
-        .topology-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .back-btn {
-            background: linear-gradient(135deg, #ff1439 0%, #ff8800 100%);
-        }
-        
-        .canvas-wrapper {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            background: transparent;
-        }
-        
-        #topology-canvas {
-            width: 100%;
-            height: 100%;
-        }
-        
-        .device-palette {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #39ff14;
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
-        }
-        
-        .device-palette h3 {
-            color: #39ff14;
-            margin: 0 0 10px 0;
-            font-size: 1rem;
-            text-align: center;
-        }
-        
-        .device-item {
-            background: rgba(57, 255, 20, 0.1);
-            border: 1px solid #39ff14;
-            border-radius: 5px;
-            padding: 8px 15px;
-            color: #39ff14;
-            cursor: move;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        
-        .device-item:hover {
-            background: rgba(57, 255, 20, 0.3);
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
-        }
-        
-        .instructions {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #39ff14;
-            border-radius: 5px;
-            padding: 10px 20px;
-            color: #39ff14;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .topology-header h1 {
-                font-size: 1.3rem;
-            }
-            
-            .topology-controls {
-                width: 100%;
-                justify-content: center;
-                margin-top: 10px;
-            }
-            
-            .device-palette {
-                left: 10px;
-                top: 10px;
-                padding: 10px;
-            }
-            
-            .instructions {
-                font-size: 0.75rem;
-                padding: 8px 15px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Netzwerk-Topologie Editor - n8n Landing</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* Animated GIF Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url('https://media.giphy.com/media/eg95n5O5SsQ1V4qhsW/giphy.gif');
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      background-attachment: fixed; z-index: -2;
+    }
+    /* Dark overlay for better contrast */
+    body::after {
+      content: '';
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); z-index: -1;
+    }
+    body { background: transparent; position: relative; }
+    .topology-container { display:flex; flex-direction:column; min-height:100vh; background:transparent; }
+    .topology-header { padding:20px; background: rgba(0,0,0,0.5); border-bottom:2px solid #39ff14; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+    .topology-header h1 { color:#39ff14; text-shadow:0 0 20px #39ff14; margin:0; font-size:1.8rem; }
+    .topology-controls { display:flex; gap:10px; flex-wrap:wrap; }
+    .topology-btn { background: linear-gradient(135deg,#39ff14 0%,#00ff88 100%); border:none; padding:10px 20px; border-radius:5px; color:#000; cursor:pointer; }
+    .hint { color:#ccc; font-size:0.9rem; }
+    /* Optional CSS glow if connections are rendered as SVG/Canvas mirror */
+    .neon-connection { stroke:#39ff14; filter: drop-shadow(0 0 6px #39ff14) drop-shadow(0 0 12px #39ff14); }
+  </style>
+  <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 </head>
 <body>
-    <div class="topology-container">
-        <div class="topology-header">
-            <h1>🔌 Netzwerk-Topologie Editor</h1>
-            <div class="topology-controls">
-                <button class="topology-btn back-btn" onclick="window.location.href='index.html'">← Zurück</button>
-                <button class="topology-btn" id="clear-btn">Leeren</button>
-                <button class="topology-btn" id="export-btn">Als PNG exportieren</button>
-            </div>
-        </div>
-        
-        <div class="canvas-wrapper">
-            <div id="topology-canvas"></div>
-            
-            <div class="device-palette">
-                <h3>Geräte</h3>
-                <div class="device-item" data-device="pc">💻 PC</div>
-                <div class="device-item" data-device="server">🖥️ Server</div>
-                <div class="device-item" data-device="switch">🔀 Switch</div>
-                <div class="device-item" data-device="router">📡 Router</div>
-            </div>
-            
-            <div class="instructions">
-                Klicke auf ein Gerät und ziehe es auf die Arbeitsfläche • Doppelklick zum Beschriften • Klick + Shift-Klick zum Verbinden
-            </div>
-        </div>
+  <div class="topology-container">
+    <header class="topology-header">
+      <h1>Netzwerk-Topologie Editor</h1>
+      <div class="topology-controls">
+        <button id="clear-btn" class="topology-btn">Leeren</button>
+        <button id="export-btn" class="topology-btn">Exportieren</button>
+      </div>
+    </header>
+    <div id="palette" style="padding:12px; display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="topology-btn device-item" data-device="router">Router</button>
+      <button class="topology-btn device-item" data-device="switch">Switch</button>
+      <button class="topology-btn device-item" data-device="pc">PC</button>
+      <button class="topology-btn device-item" data-device="server">Server</button>
+      <span class="hint">Tipp: Linksklick auf zwei Geräte, um zu verbinden.</span>
     </div>
-    
-    <!-- Konva.js CDN -->
-    <script src="https://unpkg.com/konva@9/konva.min.js"></script>
-    <script>
-        // Konva Stage und Layer initialisieren
-        const wrapper = document.querySelector('.canvas-wrapper');
-        const stage = new Konva.Stage({
-            container: 'topology-canvas',
-            width: wrapper.clientWidth,
-            height: wrapper.clientHeight,
-        });
-        
-        const layer = new Konva.Layer();
-        stage.add(layer);
-        
-        // Responsive Canvas
-        window.addEventListener('resize', () => {
-            stage.width(wrapper.clientWidth);
-            stage.height(wrapper.clientHeight);
-        });
-        
-        // Device Symbole Konfiguration
-        const deviceConfig = {
-            pc: { icon: '💻', color: '#00ff88', label: 'PC' },
-            server: { icon: '🖥️', color: '#39ff14', label: 'Server' },
-            switch: { icon: '🔀', color: '#ffff00', label: 'Switch' },
-            router: { icon: '📡', color: '#ff00ff', label: 'Router' }
-        };
-        
-        // Verbindungen speichern
-        let connections = [];
-        let selectedDevice = null;
-        
-        // Device erstellen
-        function createDevice(type, x, y) {
-            const config = deviceConfig[type];
-            const group = new Konva.Group({
-                x: x,
-                y: y,
-                draggable: true
-            });
-            
-            // Hintergrund Kreis
-            const circle = new Konva.Circle({
-                x: 0,
-                y: 0,
-                radius: 40,
-                fill: 'rgba(0, 0, 0, 0.7)',
-                stroke: config.color,
-                strokeWidth: 3,
-                shadowColor: config.color,
-                shadowBlur: 15,
-                shadowOpacity: 0.8
-            });
-            
-            // Icon Text
-            const icon = new Konva.Text({
-                x: -20,
-                y: -25,
-                text: config.icon,
-                fontSize: 40,
-                fill: config.color
-            });
-            
-            // Label
-            const label = new Konva.Text({
-                x: -40,
-                y: 45,
-                text: config.label,
-                fontSize: 14,
-                fill: config.color,
-                width: 80,
-                align: 'center'
-            });
-            
-            group.add(circle, icon, label);
-            
-            // Drag & Drop Events
-            group.on('dragmove', () => {
-                updateConnections();
-            });
-            
-            // Klick Event für Verbindungen
-            group.on('click', (e) => {
-                if (e.evt.shiftKey) {
-                    if (selectedDevice === null) {
-                        selectedDevice = group;
-                        circle.stroke('#ff0000');
-                        layer.draw();
-                    } else {
-                        createConnection(selectedDevice, group);
-                        selectedDevice.findOne('Circle').stroke(deviceConfig[selectedDevice.attrs.deviceType].color);
-                        selectedDevice = null;
-                        layer.draw();
-                    }
-                }
-            });
-            
-            // Doppelklick zum Umbenennen
-            group.on('dblclick', () => {
-                const newLabel = prompt('Neuer Name:', label.text());
-                if (newLabel) {
-                    label.text(newLabel);
-                    layer.draw();
-                }
-            });
-            
-            group.attrs.deviceType = type;
-            layer.add(group);
-            layer.draw();
+    <div id="stage-wrapper" style="flex:1; min-height:60vh;"></div>
+  </div>
+
+  <script>
+    const wrapper = document.getElementById('stage-wrapper');
+    const stage = new Konva.Stage({ container: 'stage-wrapper', width: wrapper.clientWidth, height: Math.max(600, window.innerHeight * 0.7) });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    let connections = [];
+    let nodes = [];
+    let pendingDevice = null; // stores first clicked device for simple left-click connect
+
+    function createDevice(type, x, y) {
+      const group = new Konva.Group({ x, y, draggable: true });
+
+      const base = new Konva.Rect({ width: 80, height: 50, fill: 'rgba(0,0,0,0.6)', stroke: '#39ff14', strokeWidth: 2, cornerRadius: 8, shadowColor: '#39ff14', shadowBlur: 8, shadowOpacity: 0.8 });
+      const label = new Konva.Text({ text: type.toUpperCase(), fontSize: 14, fill: '#39ff14', align: 'center', width: 80, y: 16, shadowColor: '#39ff14', shadowBlur: 6, shadowOpacity: 0.7 });
+
+      group.add(base); group.add(label);
+      layer.add(group); layer.draw();
+
+      // Simple left-click connection logic (Shift key removed)
+      group.on('click', () => {
+        if (!pendingDevice) {
+          pendingDevice = group;
+          base.stroke('#00ff88'); layer.draw();
+        } else if (pendingDevice && pendingDevice !== group) {
+          createConnection(pendingDevice, group);
+          // reset highlight
+          const prevRect = pendingDevice.findOne('Rect');
+          if (prevRect) prevRect.stroke('#39ff14');
+          pendingDevice = null;
+          base.stroke('#39ff14');
+          layer.draw();
+        } else {
+          // clicked same device again -> cancel selection
+          const prevRect = pendingDevice.findOne('Rect');
+          if (prevRect) prevRect.stroke('#39ff14');
+          pendingDevice = null; layer.draw();
         }
-        
-        // Verbindung erstellen
-        function createConnection(device1, device2) {
-            const line = new Konva.Line({
-                points: [
-                    device1.x(), device1.y(),
-                    device2.x(), device2.y()
-                ],
-                stroke: '#39ff14',
-                strokeWidth: 2,
-                opacity: 0.6,
-                dash: [10, 5],
-                shadowColor: '#39ff14',
-                shadowBlur: 10
-            });
-            
-            connections.push({ line, device1, device2 });
-            layer.add(line);
-            line.moveToBottom();
-            layer.draw();
-        }
-        
-        // Verbindungen aktualisieren
-        function updateConnections() {
-            connections.forEach(conn => {
-                conn.line.points([
-                    conn.device1.x(), conn.device1.y(),
-                    conn.device2.x(), conn.device2.y()
-                ]);
-            });
-            layer.draw();
-        }
-        
-        // Drag & Drop von Palette
-        document.querySelectorAll('.device-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const type = item.dataset.device;
-                const rect = wrapper.getBoundingClientRect();
-                createDevice(type, 150 + Math.random() * 200, 150 + Math.random() * 200);
-            });
-        });
-        
-        // Clear Button
-        document.getElementById('clear-btn').addEventListener('click', () => {
-            if (confirm('Alle Geräte und Verbindungen löschen?')) {
-                layer.destroyChildren();
-                connections = [];
-                layer.draw();
-            }
-        });
-        
-        // Export Button
-        document.getElementById('export-btn').addEventListener('click', () => {
-            const dataURL = stage.toDataURL({ pixelRatio: 2 });
-            const link = document.createElement('a');
-            link.download = 'netzwerk-topologie.png';
-            link.href = dataURL;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-        
-        // Beispiel-Topologie erstellen
-        setTimeout(() => {
-            createDevice('router', 400, 200);
-            createDevice('switch', 300, 350);
-            createDevice('switch', 500, 350);
-            createDevice('pc', 200, 500);
-            createDevice('pc', 400, 500);
-            createDevice('server', 600, 500);
-        }, 100);
-    </script>
+      });
+
+      group.on('dragmove', updateConnections);
+
+      nodes.push(group);
+      return group;
+    }
+
+    function createConnection(device1, device2) {
+      const line = new Konva.Line({
+        points: [device1.x(), device1.y(), device2.x(), device2.y()],
+        stroke: '#39ff14',
+        strokeWidth: 3,
+        opacity: 0.95,
+        shadowColor: '#39ff14',
+        shadowBlur: 18,    // stronger neon glow
+        shadowOpacity: 1,
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+
+      connections.push({ line, device1, device2 });
+      layer.add(line);
+      line.moveToBottom();
+      layer.draw();
+    }
+
+    function updateConnections() {
+      connections.forEach(conn => {
+        conn.line.points([conn.device1.x(), conn.device1.y(), conn.device2.x(), conn.device2.y()]);
+      });
+      layer.draw();
+    }
+
+    // Palette add
+    document.querySelectorAll('.device-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const type = item.dataset.device;
+        createDevice(type, 150 + Math.random() * 200, 150 + Math.random() * 200);
+      });
+    });
+
+    // Clear
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      if (confirm('Alle Geräte und Verbindungen löschen?')) {
+        layer.destroyChildren();
+        connections = []; nodes = []; pendingDevice = null;
+        layer.draw();
+      }
+    });
+
+    // Export
+    document.getElementById('export-btn').addEventListener('click', () => {
+      const dataURL = stage.toDataURL({ pixelRatio: 2 });
+      const link = document.createElement('a');
+      link.download = 'netzwerk-topologie.png';
+      link.href = dataURL; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    });
+
+    // Example topology
+    setTimeout(() => {
+      const r = createDevice('router', 400, 200);
+      const s1 = createDevice('switch', 300, 350);
+      const s2 = createDevice('switch', 500, 350);
+      const pc1 = createDevice('pc', 200, 500);
+      const pc2 = createDevice('pc', 400, 500);
+      const srv = createDevice('server', 600, 500);
+      createConnection(r, s1);
+      createConnection(r, s2);
+      createConnection(s1, pc1);
+      createConnection(s1, pc2);
+      createConnection(s2, srv);
+    }, 100);
+
+    window.addEventListener('resize', () => {
+      stage.size({ width: wrapper.clientWidth, height: Math.max(600, window.innerHeight * 0.7) });
+      updateConnections();
+    });
+  </script>
 </body>
 </html>
