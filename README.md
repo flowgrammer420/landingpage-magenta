@@ -1,15 +1,22 @@
 # 🌟 n8n Landingpage mit AI Starter Kit - Docker Edition
-Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Reverse Proxy, n8n AI Starter Kit Support und spektakulärer 3D-Flip-Animation!
+
+Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Reverse Proxy, n8n AI Starter Kit Support und animiertem GIF-Hintergrund im Neon-Style!
 
 ## ✨ Features
 
-### 🎨 3D Flip-Box Animation (Highlight!)
-- **Interaktive 3D-Animation**: Klick auf "Admin Bereich" dreht die gesamte Seite um 180° (CSS 3D Transform)
-- **Embedded n8n iframe**: Auf der Rückseite wird das n8n Admin-Interface direkt eingebettet angezeigt
-- **Nahtlose Integration**: Kein Seitenwechsel, keine neue URL - alles auf einer Seite
-- **Zurück-Button**: "← Zurück zur Landing Page" flippt die Seite wieder zurück zur Vorderseite
-- **Smooth Transitions**: 0.8s CSS-Animationen mit `transform-style: preserve-3d`
-- **Optimiert für Performance**: Hardware-beschleunigte Transformationen
+### 🎨 Animierter GIF-Hintergrund
+- **Dynamischer visueller Effekt**: Beweglicher GIF-Hintergrund aus Giphy für moderne Optik
+- **Dark Overlay**: Halbtransparente dunkle Schicht (rgba(0, 0, 0, 0.7)) für optimale Lesbarkeit
+- **Fixed Positioning**: Hintergrund bleibt beim Scrollen fixiert
+- **Responsive**: Passt sich allen Bildschirmgrößen an (background-size: cover)
+- **Performance-optimiert**: CSS-basiert, keine JavaScript-Animationen nötig
+
+### 📋 Klassisches Menü
+- **Responsive Navigation**: Flexibles Menü mit Home, Netzwerkeditor, n8n, Kontakt
+- **Neon-Style**: Grüne (#39ff14) Buttons mit Hover-Effekten und Glow
+- **Mobile-optimiert**: Vertikale Anordnung auf kleinen Bildschirmen
+- **n8n-Link**: Direkter Zugriff auf n8n-Interface unter /n8n/
+- **Kein Seitenwechsel nötig**: Kontakt-Formular direkt auf der Startseite
 
 ### 🐳 Docker Integration
 - **Ein-Befehl-Deployment**: `docker compose up -d` startet alles
@@ -25,208 +32,169 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 
 ### 🎨 Design & UI
 - **Neon-inspiriertes Design** mit leuchtenden #39ff14 Effekten
+- **Animierter GIF-Hintergrund**: Moderner visueller Effekt mit optimaler Kontraststufe
 - **Dark/Light Mode Toggle** mit persistenter Speicherung
-- **3D-Flip-Animation**: Kernfeature für nahtlosen Übergang zum n8n Interface
 - **Responsive Design** für alle Bildschirmgrößen
 - **Optimierte Asset-Auslieferung** durch Nginx
-- **Animierter GIF-Hintergrund**: Dynamischer visueller Effekt mit dunklem Overlay für bessere Lesbarkeit
+- **Smooth Scrolling**: Sanfte Übergänge zwischen Sektionen
 
 ### 🔌 Netzwerk-Topologie Editor
 - **Interaktiver Netzwerk-Editor** mit Drag & Drop (feature.html)
-- **Cytoscape.js** für leistungsstarke Visualisierung
-- **Echtzeit-Verbindungen** zwischen Nodes per einfachem Linksklick
-- **Neon-Design** passend zur Landing Page (Verbindungen in #39ff14 mit Glow)
+- **Konva.js** für leistungsstarke Canvas-basierte Visualisierung
+- **Device Palette**: Router, Switch, Server, PC, Firewall per Klick hinzufügen
+- **Echtzeit-Verbindungen**: Klick auf zwei Geräte erstellt automatisch Verbindungen
+- **Neon-Design**: Grüne Borders und Glow-Effekte passend zur Landing Page
 - **Responsive & Touch-optimiert**
-- **JSON Export/Import** für Topologie-Speicherung
+- **Draggable Nodes**: Alle Netzwerkgeräte frei verschiebbar
+
+### 📧 Kontaktformular
+- **Direkt auf Startseite**: Kein extra Routing nötig
+- **Validierung**: Name, E-Mail, Nachricht sind Pflichtfelder
+- **n8n Webhook Integration**: Formulardaten werden an n8n gesendet
+- **Feedback-Benachrichtigungen**: Erfolgs- und Fehlermeldungen
 
 ## 📁 Projektstruktur
 
 ```
 landingpage-n8n/
 │
-├── index.html              # Landing Page mit 3D Flip-Box
-├── feature.html            # Netzwerk-Topologie Editor  
+├── index.html              # Landing Page mit GIF-Hintergrund und klassischem Menü
+├── feature.html            # Netzwerk-Topologie Editor mit Konva.js
 ├── README.md               # Diese Dokumentation
 │
 ├── assets/
 │   ├── css/
-│   │   └── style.css       # Hauptstyles
+│   │   └── style.css       # Hauptstyles (Neon-Design, ohne Flip-Styles)
 │   └── js/
-│       └── script.js       # Hauptskript (Contact Form, Theme Toggle)
+│       ├── main.js         # Contact Form und Smooth Scroll
+│       └── script.js       # Theme Toggle und weitere Features
 │
 └── backend/
     ├── docker-compose.yml  # Vollständige Container-Orchestrierung
-    └── nginx.conf          # Reverse Proxy Konfiguration
+    ├── nginx.conf          # Nginx Reverse Proxy Konfiguration
+    └── .env.example        # Umgebungsvariablen Template
 ```
 
-## 🚀 Installation & Start
+## 🚀 Quick Start
 
 ### Voraussetzungen
 - Docker & Docker Compose installiert
-- Port 8080, 5680 und 6333 verfügbar
+- Ports 8080, 5680, 6333 verfügbar
 
-### Schnellstart
+### Installation
 
-```bash
-# Repository klonen
-git clone https://github.com/flowgrammer420/landingpage-n8n.git
-cd landingpage-n8n/backend
+1. **Repository klonen**:
+   ```bash
+   git clone https://github.com/flowgrammer420/landingpage-n8n.git
+   cd landingpage-n8n
+   ```
 
-# Docker Container starten
-docker compose up -d
+2. **Environment konfigurieren**:
+   ```bash
+   cd backend
+   cp .env.example .env
+   # .env nach Bedarf anpassen
+   ```
 
-# Warten bis alle Services bereit sind (ca. 30 Sekunden)
-docker compose logs -f n8n
-```
+3. **Container starten**:
+   ```bash
+   docker compose up -d
+   ```
 
-### Zugriff
+4. **Zugriff**:
+   - Landing Page: `http://localhost:8080`
+   - n8n Interface: `http://localhost:8080/n8n/`
+   - Netzwerk-Editor: `http://localhost:8080/feature.html`
 
-1. **Landing Page**: http://localhost:8080/
-   - Klicke auf "Admin Bereich" im Menü → Die Seite flippt um
-   - Auf der Rückseite siehst du das eingebettete n8n Interface
-   - Klicke "← Zurück zur Landing Page" → Die Seite flippt zurück
+## 🎯 Verwendung
 
-2. **Direkt n8n**: http://localhost:8080/n8n/ (falls du die Flip-Animation überspringen möchtest)
+### Landing Page
+- **Responsive Navigation**: Menü oben mit allen wichtigen Links
+- **GIF-Hintergrund**: Automatisch geladen und animiert
+- **n8n-Zugriff**: Klick auf "n8n" im Menü öffnet /n8n/
+- **Kontaktformular**: Scroll zu "Kontakt" oder klick im Menü
 
-3. **Qdrant Dashboard**: http://localhost:6333/dashboard
+### Netzwerk-Editor
+- **Geräte hinzufügen**: Buttons in der Palette links klicken
+- **Verbindungen erstellen**: Zwei Geräte nacheinander anklicken
+- **Geräte verschieben**: Drag & Drop auf dem Canvas
+- **Zurück**: "Home" im Menü oben
 
-4. **Netzwerk-Topologie Editor**: http://localhost:8080/feature.html
+## 🔧 Konfiguration
 
-### Container verwalten
+### n8n Settings
+- Webhook URL für Kontaktformular in `main.js` anpassen
+- n8n Workflows können über das Admin-Interface erstellt werden
 
-```bash
-# Status prüfen
-docker compose ps
+### Styling
+- Neon-Farbe (#39ff14) in `style.css` änderbar
+- GIF-URL in `index.html` und `feature.html` anpassbar
+- Overlay-Transparenz (0.7) in beiden HTML-Dateien einstellbar
 
-# Logs ansehen
-docker compose logs -f
+### Docker
+- Ports in `docker-compose.yml` anpassbar
+- Nginx Konfiguration in `nginx.conf`
+- Umgebungsvariablen in `.env`
 
-# Stoppen
-docker compose stop
+## 📝 Technologie-Stack
 
-# Neustarten
-docker compose restart
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Canvas-Rendering**: Konva.js (Netzwerk-Editor)
+- **Backend**: n8n (Workflow Automation)
+- **Database**: PostgreSQL (n8n Daten)
+- **Vector DB**: Qdrant (AI Embeddings)
+- **Webserver**: Nginx (Reverse Proxy)
+- **Container**: Docker & Docker Compose
 
-# Komplett entfernen
-docker compose down
+## 🎨 Design-Prinzipien
 
-# Mit Volumen löschen (ACHTUNG: Alle Daten gehen verloren!)
-docker compose down -v
-```
+- **Neon Dark Mode**: Grüne (#39ff14) Leuchteffekte auf dunklem Hintergrund
+- **Animated Background**: GIF für dynamische, moderne Optik
+- **Minimalistisch**: Fokus auf Funktionalität ohne Überladung
+- **Responsive First**: Mobile-optimiert von Grund auf
+- **Performance**: Leichtgewichtig, keine unnötigen Frameworks
 
-## 🎯 n8n AI Starter Kit
+## 📦 Container-Details
 
-Dieses Setup ist vollständig kompatibel mit dem [n8n AI Starter Kit](https://github.com/n8n-io/n8n-ai-starter-kit):
+### nginx (Port 8080)
+- Statische Files (index.html, assets)
+- Reverse Proxy für n8n unter `/n8n/`
+- Gzip Kompression
+- Browser Caching Headers
 
-- ✅ Postgres als Datenbank
-- ✅ Qdrant für Vector Embeddings
-- ✅ Optimierte Umgebungsvariablen
+### n8n (Port 5680)
+- Workflow Automation Platform
+- WebHook Endpoints
+- AI Starter Kit Support
 
-### AI Workflow Beispiel
+### postgres (intern)
+- n8n Datenbank
+- Persistent Storage
 
-1. n8n öffnen: Klick auf "Admin Bereich" für 3D-Flip oder direkt http://localhost:8080/n8n/
-2. Neuen Workflow erstellen
-3. Qdrant Node hinzufügen
-   - Host: `qdrant`
-   - Port: `6333`
-4. AI Agent Node mit deinem LLM konfigurieren
-
-## 🎨 3D Flip-Box Technische Details
-
-Die 3D-Flip-Animation nutzt moderne CSS3-Features:
-
-```css
-.flip-container {
-    perspective: 1000px;  /* 3D-Perspektive */
-}
-
-.flipper {
-    transition: transform 0.8s;
-    transform-style: preserve-3d;  /* Kinder in 3D rendern */
-}
-
-.flip-container.flipped .flipper {
-    transform: rotateY(180deg);  /* Um Y-Achse drehen */
-}
-
-.front, .back {
-    backface-visibility: hidden;  /* Rückseite unsichtbar */
-}
-
-.back {
-    transform: rotateY(180deg);  /* Rückseite vorgedreht */
-}
-```
-
-### iframe Integration
-
-Das n8n Interface wird direkt eingebettet:
-
-```html
-<iframe src="http://localhost:5678/" 
-        allow="clipboard-read; clipboard-write" 
-        title="n8n Workflow Automation">
-</iframe>
-```
-
-**Wichtig**: Der iframe nutzt `http://localhost:5678/` (interner n8n Port), da der Browser vom gleichen Host aus zugreift.
-
-## 📝 Wichtige Hinweise
-
-### iframe URL Konfiguration
-
-Die iframe URL in `index.html` zeigt standardmäßig auf `http://localhost:5678/`:
-
-- **Lokale Entwicklung**: `http://localhost:5678/` funktioniert perfekt
-- **Production mit Domain**: Ändere zu `https://yourdomain.com/n8n/`
-- **Docker interne Kommunikation**: Nginx nutzt `http://n8n:5678` (siehe nginx.conf)
-
-### Production Deployment
-
-Für Produktion solltest du:
-
-1. **Sichere Passwörter** in `docker-compose.yml` setzen
-2. **HTTPS** mit Let's Encrypt einrichten
-3. **N8N_HOST** auf deine Domain ändern
-4. **WEBHOOK_URL** und **N8N_EDITOR_BASE_URL** entsprechend anpassen
-5. **iframe src** in index.html auf `https://yourdomain.com/n8n/` ändern
-
-### Troubleshooting
-
-**Problem**: n8n lädt nicht im iframe
-- Überprüfe ob alle Container laufen: `docker compose ps`
-- Checke n8n Logs: `docker compose logs n8n`
-- Stelle sicher dass Port 5680 nicht belegt ist
-- Prüfe Browser Console auf CORS/CSP Fehler
-
-**Problem**: Flip-Animation funktioniert nicht
-- Öffne Browser DevTools und checke Console auf JavaScript-Fehler
-- Stelle sicher dass das `#flipContainer` Element existiert
-- Prüfe ob die CSS-Klasse `flipped` korrekt hinzugefügt wird
-
-**Problem**: Reverse Proxy Fehler
-- Nginx Logs prüfen: `docker compose logs nginx`
-- Stelle sicher dass n8n vor nginx startet (depends_on in docker-compose.yml)
-
-**Problem**: Qdrant verbindet nicht
-- Checke ob Container läuft: `docker compose ps qdrant`
-- Prüfe Port 6333: `curl http://localhost:6333`
+### qdrant (Port 6333)
+- Vector Database
+- AI Embeddings Storage
 
 ## 🤝 Contributing
 
-Pull Requests sind willkommen! Für größere Änderungen bitte zuerst ein Issue erstellen.
+Beiträge sind willkommen! Bitte:
+1. Fork das Repository
+2. Feature Branch erstellen (`git checkout -b feature/AmazingFeature`)
+3. Änderungen committen (`git commit -m 'Add some AmazingFeature'`)
+4. Branch pushen (`git push origin feature/AmazingFeature`)
+5. Pull Request öffnen
 
 ## 📄 Lizenz
 
-MIT License - siehe LICENSE Datei für Details
+Dieses Projekt ist Open Source und verfügbar unter der MIT License.
 
 ## 🙏 Credits
 
-- [n8n](https://n8n.io/) - Workflow Automation
-- [Qdrant](https://qdrant.tech/) - Vector Database
-- [Nginx](https://nginx.org/) - Reverse Proxy
-- [Cytoscape.js](https://js.cytoscape.org/) - Network Topology Visualization
+- **n8n**: Workflow Automation Platform
+- **Konva.js**: Canvas Library für Netzwerk-Editor
+- **Giphy**: GIF-Hintergrund
+- **Docker**: Containerisierung
 
 ---
 
-**Made with ❤️ and ⚡ by the n8n Community**
+**Happy Automating! 🚀**
