@@ -23,12 +23,23 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 - **Responsive Design** für alle Bildschirmgrößen
 - **Optimierte Asset-Auslieferung** durch Nginx
 
+### 🔌 Netzwerk-Topologie Editor (NEU!)
+- **Interaktiver Netzwerk-Editor** mit Drag & Drop
+- **Konva.js Canvas** für leistungsstarke Visualisierung
+- **4 vordefinierte Gerätetypen**: PC 💻, Server 🖥️, Switch 🔀, Router 📡
+- **Echtzeit-Verbindungen** zwischen Geräten (Shift+Klick)
+- **Individuelle Beschriftung** per Doppelklick
+- **PNG Export** für Dokumentation
+- **Neon-Design** passend zur Landing Page
+- **Responsive & Touch-optimiert**
+
 ## 📁 Projektstruktur
 
 ```
 landingpage-n8n/
 │
 ├── index.html              # Landing Page (iframe nutzt /n8n/)
+├── feature.html            # Netzwerk-Topologie Editor (NEU!)
 ├── README.md               # Diese Dokumentation
 ├── assets/                 # Statische Assets
 │   ├── css/style.css       # Styling inkl. 3D-Flip & Themes
@@ -59,178 +70,66 @@ cd backend
 docker compose up -d
 ```
 
-#### 3. Warten bis alle Container ready sind (ca. 30-60 Sekunden)
-```bash
-docker compose logs -f
-# Warte auf: "Editor is now accessible via: http://localhost:5678/"
-# Strg+C zum Beenden der Logs
-```
+#### 3. Zugriff
+- **Landing Page**: http://localhost:8080
+- **Netzwerk Editor**: http://localhost:8080/feature.html
+- **n8n Admin**: Klicke auf "Admin Bereich" oder navigiere direkt zu http://localhost:8080/n8n/
 
-#### 4. Im Browser öffnen
-Öffne: http://localhost:8080
-
-**Das war's! 🎉**
-
-### Was passiert im Hintergrund?
-
-1. **Nginx Container** startet auf Port 8080 (öffentlich)
-2. **n8n Container** startet intern auf Port 5678 (mapped zu Host-Port 5680)
-3. **Postgres Container** startet intern (nur für n8n erreichbar)
-4. **Qdrant Container** startet auf Port 6333 für AI Vector Storage
-5. Alle Container sind im `demo` Netzwerk verbunden
-6. Nginx proxied `/n8n/` → `http://n8n:5678/` (intern)
-
-## 🔧 Konfiguration
-
-### Port-Übersicht
-
-| Service | Interner Port | Host Port | Zugriff |
-|---------|---------------|-----------|----------|
-| nginx   | 80            | 8080      | http://localhost:8080 (Landing Page) |
-| n8n     | 5678          | 5680      | http://localhost:8080/n8n/ (via nginx) oder http://localhost:5680 (direkt) |
-| postgres| 5432          | -         | Nur intern (n8n DB) |
-| qdrant  | 6333          | 6333      | http://localhost:6333 (Vector DB API) |
-
-### n8n Umgebungsvariablen
-
-Die wichtigsten Variablen in `docker-compose.yml`:
-
-```yaml
-- N8N_PORT=5678          # Interner n8n Port
-- N8N_PATH=/n8n/         # URL-Pfad für Nginx Proxy
-- N8N_EDITOR_BASE_URL=http://localhost:8080/n8n/
-- WEBHOOK_URL=http://localhost:8080/n8n/
-```
-
-### Nginx Proxy Konfiguration
-
-In `nginx.conf`:
-
-```nginx
-location /n8n/ {
-    proxy_pass http://n8n:5678/;  # Interner Container-Name und Port
-    proxy_http_version 1.1;
-    
-    # WebSocket Support (wichtig für AI Features!)
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-    
-    # Lange Timeouts für AI-Workflows
-    proxy_read_timeout 600s;
-    
-    # Kein Buffering gegen Connection Lost
-    proxy_buffering off;
-}
-```
-
-## 🛠️ Troubleshooting
-
-### Problem: "Connection Lost" in n8n
-
-**Lösung 1**: Überprüfe, dass alle Container laufen
-```bash
-cd backend
-docker compose ps
-# Alle sollten "Up" Status haben
-```
-
-**Lösung 2**: Prüfe nginx Logs
-```bash
-docker logs landingpage-nginx
-```
-
-**Lösung 3**: Prüfe n8n Logs
-```bash
-docker logs landingpage-n8n-ai
-```
-
-**Lösung 4**: Restart aller Services
-```bash
-docker compose restart
-```
-
-### Problem: n8n lädt nicht / 502 Bad Gateway
-
-**Ursache**: n8n ist noch nicht vollständig gestartet
-
-**Lösung**: Warte 30-60 Sekunden und lade die Seite neu. Prüfe:
-```bash
-docker logs landingpage-n8n-ai
-# Warte auf: "Editor is now accessible via: http://localhost:5678/"
-```
-
-### Problem: Ports bereits belegt
-
-**Fehlermeldung**: `bind: address already in use`
-
-**Lösung 1**: Ändere Port in `docker-compose.yml`
-```yaml
-services:
-  nginx:
-    ports:
-      - "8081:80"  # Statt 8080
-  n8n:
-    ports:
-      - "5681:5678"  # Statt 5680
-```
-
-**Lösung 2**: Finde und stoppe den blockierenden Prozess
-```bash
-# Windows
-netstat -ano | findstr :8080
-
-# Mac/Linux
-lsof -i :8080
-```
-
-### Problem: n8n Daten gehen verloren
-
-**Ursache**: Docker Volumes wurden gelöscht
-
-**Prüfung**:
-```bash
-docker volume ls | grep landingpage
-```
-
-**Volumes wiederherstellen**: Einmal `docker compose up -d` ausführen
-
-### Problem: AI-Features funktionieren nicht
-
-**Lösung 1**: Prüfe Qdrant Status
-```bash
-docker logs landingpage-qdrant
-curl http://localhost:6333/health
-```
-
-**Lösung 2**: Prüfe Postgres Verbindung
-```bash
-docker exec landingpage-postgres psql -U n8n -d n8n -c "SELECT 1;"
-```
-
-**Lösung 3**: Konfiguriere n8n für Postgres
-In n8n UI → Settings → Database → Postgres Connection:
-- Host: `postgres`
-- Port: `5432`
-- Database: `n8n`
-- User: `n8n`
-- Password: `n8n_password_change_me`
-
-## 🔄 Häufige Befehle
-
-### Container starten
-```bash
-cd backend
-docker compose up -d
-```
-
-### Container stoppen
+#### 4. Container stoppen
 ```bash
 docker compose down
 ```
 
-### Container stoppen + Volumes löschen (⚠️ Datenverlust!)
+## 🔌 Netzwerk-Topologie Editor - Bedienung
+
+Der interaktive Netzwerk-Editor ist über die Navigation erreichbar: **🔌 Netzwerk Editor**
+
+### Grundfunktionen
+1. **Gerät hinzufügen**: Klicke auf ein Gerät in der Palette (links)
+   - 💻 PC (türkis)
+   - 🖥️ Server (neongrün)
+   - 🔀 Switch (gelb)
+   - 📡 Router (magenta)
+
+2. **Geräte verschieben**: Ziehe Geräte mit der Maus auf der Arbeitsfläche
+
+3. **Geräte verbinden**:
+   - Klicke auf das erste Gerät mit **gedrückter Shift-Taste**
+   - Das Gerät wird rot markiert
+   - Klicke auf das zweite Gerät (ebenfalls mit Shift)
+   - Eine animierte Verbindungslinie erscheint
+
+4. **Gerät beschriften**: Doppelklicke auf ein Gerät und gib einen Namen ein
+
+5. **Als PNG exportieren**: Klicke auf "Als PNG exportieren" in der oberen Leiste
+   - Die Datei `netzwerk-topologie.png` wird heruntergeladen
+
+6. **Zurücksetzen**: Klicke auf "Leeren" um alle Geräte zu entfernen
+
+### Beispiel-Topologie
+
+Beim Start wird automatisch eine Beispiel-Netzwerktopologie geladen:
+
+```
+        [Router]
+         /    \
+    [Switch]  [Switch]
+      /  |        |
+   [PC][PC]  [Server]
+```
+
+### Screenshots
+
+![Netzwerk-Topologie Editor](https://via.placeholder.com/800x450/0f0f1e/39ff14?text=Netzwerk-Topologie+Editor)
+
+*Hinweis: Screenshot-Pfad kann später mit echtem Bild ersetzt werden*
+
+## 🔧 Docker Management
+
+### Services neustarten
 ```bash
-docker compose down -v
+cd backend
+docker compose restart
 ```
 
 ### Logs anzeigen
@@ -313,6 +212,7 @@ MIT License - siehe Details im Repository
 - [Nginx](https://nginx.org) - Reverse Proxy
 - [Docker](https://docker.com) - Containerization
 - [Qdrant](https://qdrant.tech) - Vector Database für AI
+- [Konva.js](https://konvajs.org) - Canvas-Bibliothek für Netzwerk-Editor
 
 ---
 
