@@ -7,8 +7,7 @@ services:
       - "8080:80"  # Public port for landing page
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ../index.html:/usr/share/nginx/html/index.html:ro
-      - ../assets:/usr/share/nginx/html/assets:ro
+      - ..:/usr/share/nginx/html:ro  # Mount entire parent directory to nginx root
     depends_on:
       - n8n
     restart: unless-stopped
@@ -74,28 +73,11 @@ services:
     networks:
       - demo
 
-  # One-shot init container to pull the llama model at startup
-  ollama-pull-llama:
-    image: ollama/ollama:latest
-    container_name: landingpage-ollama-pull
-    depends_on:
-      - ollama
-    restart: "no"
-    entrypoint: ["/bin/sh","-c","sleep 3 && ollama pull llama3.1"]
-    networks:
-      - demo
-    volumes:
-      - ollama_storage:/root/.ollama
-
 volumes:
   n8n_storage:
-    driver: local
   postgres_storage:
-    driver: local
   qdrant_storage:
-    driver: local
   ollama_storage:
-    driver: local
 
 networks:
   demo:
