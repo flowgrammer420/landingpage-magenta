@@ -3,14 +3,14 @@
 ======================================= */
 :root {
   --bg-color: #0a0e27;
-  --text-color: #39ff14;
-  --neon-glow: #39ff14;
-  --nav-bg: rgba(57, 255, 20, 0.1);
+  --text-color: #FF0080;
+  --neon-glow: #FF0080;
+  --nav-bg: rgba(255, 0, 128, 0.1);
   --form-bg: rgba(10, 14, 39, 0.7);
-  --btn-hover: #2fe600;
-  --shadow: rgba(57, 255, 20, 0.6);
+  --btn-hover: #FF0080;
+  --shadow: rgba(255, 0, 128, 0.6);
   --input-bg: rgba(255, 255, 255, 0.05);
-  --input-border: #39ff14;
+  --input-border: #FF0080;
 }
 
 /* Light Mode */
@@ -81,26 +81,31 @@ h1 {
 ======================================= */
 .contact-form {
   background: var(--form-bg);
-  padding: 30px;
-  border-radius: 12px;
-  margin-top: 40px;
-  border: 2px solid var(--neon-glow);
-  box-shadow: 0 0 30px var(--shadow);
   backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--neon-glow);
+  animation: slideIn 0.8s ease-out;
 }
 
-.contact-form h2 {
-  font-family: 'Orbitron', sans-serif;
-  color: var(--neon-glow);
+.form-group {
   margin-bottom: 20px;
-  text-shadow: 0 0 10px var(--shadow);
+  text-align: left;
 }
 
-.contact-form input,
-.contact-form textarea {
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--neon-glow);
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
   background: var(--input-bg);
   border: 2px solid var(--input-border);
   border-radius: 8px;
@@ -109,18 +114,23 @@ h1 {
   transition: all 0.3s ease;
 }
 
-.contact-form input:focus,
-.contact-form textarea:focus {
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus {
   outline: none;
+  border-color: var(--neon-glow);
   box-shadow: 0 0 15px var(--shadow);
-  background: rgba(255, 255, 255, 0.1);
 }
 
-.contact-form button {
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+button[type="submit"] {
   width: 100%;
   padding: 15px;
-  margin-top: 15px;
-  background: linear-gradient(135deg, var(--neon-glow) 0%, var(--btn-hover) 100%);
+  background: var(--neon-glow);
   color: #000;
   border: none;
   border-radius: 8px;
@@ -128,39 +138,37 @@ h1 {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  box-shadow: 0 0 20px var(--shadow);
 }
 
-.contact-form button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 25px var(--shadow);
+button[type="submit"]:hover {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px var(--shadow);
 }
 
 /* ======================================
-   Notification Messages
+   Notification
 ======================================= */
 .notification {
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 15px 25px;
-  background: rgba(57, 255, 20, 0.9);
+  padding: 15px 20px;
+  background: var(--neon-glow);
   color: #000;
   border-radius: 8px;
-  box-shadow: 0 5px 25px var(--shadow);
-  z-index: 1000;
-  display: none;
-  animation: slideIn 0.3s ease;
+  box-shadow: 0 10px 30px var(--shadow);
+  opacity: 0;
+  transform: translateX(400px);
+  transition: all 0.5s ease;
+  z-index: 999;
+  font-weight: 500;
 }
 
 .notification.show {
-  display: block;
-}
-
-.notification.error {
-  background: rgba(255, 50, 50, 0.9);
-  color: #fff;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 @keyframes slideIn {
