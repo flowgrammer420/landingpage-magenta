@@ -1,10 +1,11 @@
 version: '3.8'
+
 services:
   nginx:
     image: nginx:alpine
     container_name: landingpage-nginx
     ports:
-      - "8080:80"
+      - "8080:80"  # Public port for landing page
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ../index.html:/usr/share/nginx/html/index.html:ro
@@ -13,26 +14,62 @@ services:
       - n8n
     restart: unless-stopped
     networks:
-      - landingpage-network
+      - demo
+
   n8n:
     image: n8nio/n8n:latest
-    container_name: landingpage-n8n
+    container_name: landingpage-n8n-ai
+    ports:
+      - "5680:5678"  # Map internal n8n port 5678 to host port 5680
     environment:
       - N8N_HOST=localhost
-      - N8N_PORT=8080
+      - N8N_PORT=5678  # Internal n8n port
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=http://localhost:8080/n8n/
-      - VUE_APP_URL_BASE_API=http://localhost:8080/n8n/
       - N8N_PATH=/n8n/
       - N8N_EDITOR_BASE_URL=http://localhost:8080/n8n/
+      - N8N_METRICS=true
+      - GENERIC_TIMEZONE=Europe/Berlin
     volumes:
       - n8n-data:/home/node/.n8n
     restart: unless-stopped
     networks:
-      - landingpage-network
+      - demo
+
+  # Postgres for n8n AI starter kit (optional but recommended)
+  postgres:
+    image: postgres:15-alpine
+    container_name: landingpage-postgres
+    environment:
+      - POSTGRES_DB=n8n
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=n8n_password_change_me
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - demo
+
+  # Qdrant vector database for AI features
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: landingpage-qdrant
+    ports:
+      - "6333:6333"  # Qdrant API
+    volumes:
+      - qdrant-data:/qdrant/storage
+    restart: unless-stopped
+    networks:
+      - demo
+
 volumes:
   n8n-data:
     driver: local
+  postgres-data:
+    driver: local
+  qdrant-data:
+    driver: local
+
 networks:
-  landingpage-network:
+  demo:
     driver: bridge
