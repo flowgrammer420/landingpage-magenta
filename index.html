@@ -38,6 +38,54 @@
             background: transparent;
             position: relative;
             overflow-x: hidden;
+            transition: transform 0.6s ease-in-out;
+        }
+        
+        /* Light mode styles */
+        body.light-mode {
+            background: #f0f0f0;
+        }
+        
+        body.light-mode::after {
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        body.light-mode nav {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-bottom: 2px solid #00CED1 !important;
+        }
+        
+        body.light-mode nav a,
+        body.light-mode nav button {
+            color: #00CED1 !important;
+            border-color: #00CED1 !important;
+        }
+        
+        body.light-mode nav a:hover,
+        body.light-mode nav button:hover {
+            background: #00CED1 !important;
+            color: #fff !important;
+            box-shadow: 0 0 15px #00CED1 !important;
+        }
+        
+        body.light-mode main h1 {
+            color: #00CED1 !important;
+            text-shadow: 0 0 10px #00CED1 !important;
+        }
+        
+        body.light-mode main p {
+            color: #333 !important;
+        }
+        
+        /* Page rotation animation */
+        @keyframes rotateY {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        
+        body.rotating {
+            animation: rotateY 0.8s ease-in-out;
         }
         
         /* Responsive Navigation Menu Styles */
@@ -52,7 +100,7 @@
             border-bottom: 2px solid #FF0080;
         }
         
-        nav a {
+        nav a, nav button {
             color: #FF0080;
             text-decoration: none;
             padding: 10px 20px;
@@ -61,12 +109,25 @@
             transition: all 0.3s ease;
             font-size: 16px;
             white-space: nowrap;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
         }
         
-        nav a:hover {
+        nav a:hover, nav button:hover {
             background: #FF0080;
             color: #000;
             box-shadow: 0 0 15px #FF0080;
+        }
+        
+        #theme-toggle {
+            background: #FFD700;
+            color: #000;
+            border-color: #FFD700;
+        }
+        
+        #theme-toggle:hover {
+            box-shadow: 0 0 15px #FFD700;
         }
         
         /* Mobile responsiveness */
@@ -76,7 +137,7 @@
                 gap: 10px;
             }
             
-            nav a {
+            nav a, nav button {
                 width: 80%;
                 text-align: center;
             }
@@ -84,12 +145,14 @@
     </style>
 </head>
 <body>
-    <!-- Navigation for Home and Netzwerkeditor -->
+    <!-- Navigation for Home, Netzwerkeditor, Admin, and Dark/Light Mode -->
     <nav>
         <a href="index.html">Home</a>
         <a href="feature.html">Netzwerkeditor</a>
+        <a href="/n8n/" id="admin-btn">Admin-Bereich</a>
+        <button id="theme-toggle">🌙 Dark/Light Mode</button>
     </nav>
-
+    
     <!-- Three.js Library -->
     <script type="importmap">
         {
@@ -99,7 +162,7 @@
             }
         }
     </script>
-
+    
     <!-- Three.js Canvas for 3D Background -->
     <canvas id="threejs-canvas"></canvas>
     
@@ -115,6 +178,37 @@
         <h1 style="font-size: 3em; margin-bottom: 20px; text-shadow: 0 0 10px #FF0080;">n8n Landingpage</h1>
         <p style="font-size: 1.5em; color: #fff;">Automate Workflows im Neon-Style!</p>
     </main>
+    
+    <!-- Dark/Light Mode Toggle Script -->
+    <script>
+        // Check localStorage for saved theme preference
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        if (currentTheme === 'light') {
+            document.body.classList.add('light-mode');
+        }
+        
+        // Theme toggle functionality
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            
+            // Save preference to localStorage
+            if (document.body.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+            } else {
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Admin button page rotation effect
+        document.getElementById('admin-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.body.classList.add('rotating');
+            
+            setTimeout(function() {
+                window.location.href = '/n8n/';
+            }, 800);
+        });
+    </script>
     
     <!-- Three.js 3D Background Script with OrbitControls -->
     <script type="module">
