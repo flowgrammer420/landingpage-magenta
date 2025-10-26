@@ -22,6 +22,7 @@ Eine vollständig containerisierte n8n Landing Page mit Docker Compose, Nginx Re
 - **3D-Flip-Animation**: Smooth Übergang zwischen Landing Page und n8n
 - **Responsive Design** für alle Bildschirmgrößen
 - **Optimierte Asset-Auslieferung** durch Nginx
+- **Animierter GIF-Hintergrund**: Dynamischer visueller Effekt mit dunklem Overlay für bessere Lesbarkeit
 
 ### 🔌 Netzwerk-Topologie Editor (NEU!)
 - **Interaktiver Netzwerk-Editor** mit Drag & Drop
@@ -53,93 +54,126 @@ landingpage-n8n/
 
 ### Voraussetzungen
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installiert und gestartet
-- Git installiert
-- Mindestens 4GB RAM für alle Container
 
-### Step-by-Step Anleitung
+### Installation
 
-#### 1. Repository klonen
-```bash
-git clone https://github.com/flowgrammer420/landingpage-n8n.git
-cd landingpage-n8n
+1. **Repository klonen**:
+   ```bash
+   git clone https://github.com/flowgrammer420/landingpage-n8n.git
+   cd landingpage-n8n
+   ```
+
+2. **Docker Services starten**:
+   ```bash
+   cd backend
+   docker compose up -d
+   ```
+
+3. **Landing Page öffnen**:
+   ```
+   http://localhost:8080
+   ```
+
+4. **n8n direkt aufrufen**:
+   ```
+   http://localhost:8080/n8n/
+   ```
+
+### 📊 Service Status
+- 🌐 **Landing Page**: http://localhost:8080
+- 🔧 **n8n Interface**: http://localhost:8080/n8n/
+- 🔌 **Netzwerk-Editor**: http://localhost:8080/feature.html
+- 📊 **Qdrant Dashboard**: http://localhost:6333/dashboard
+
+## 🎬 Animierter GIF-Hintergrund anpassen
+
+Beide HTML-Dateien (index.html und feature.html) verwenden ein animiertes GIF als Hintergrund für einen dynamischen visuellen Effekt.
+
+### GIF-URL ändern
+
+**In index.html:**
+1. Öffne `index.html` in einem Editor
+2. Suche nach der CSS-Regel `body::before`
+3. Ändere die `background-image` URL:
+   ```css
+   background-image: url('DEINE_NEUE_GIF_URL_HIER');
+   ```
+
+**In feature.html:**
+1. Öffne `feature.html` in einem Editor
+2. Suche nach der CSS-Regel `body::before`
+3. Ändere die `background-image` URL:
+   ```css
+   background-image: url('DEINE_NEUE_GIF_URL_HIER');
+   ```
+
+### GIF-Quellen
+- **Giphy**: Kopiere die direkte GIF-URL (endet auf .gif)
+- **Tenor**: Verwende die direkte Medien-URL
+- **Eigene Dateien**: Lege das GIF in den `assets/` Ordner und verwende einen relativen Pfad
+
+### Overlay-Einstellungen anpassen
+Um die Lesbarkeit zu verbessern, wird ein dunkles Overlay über das GIF gelegt:
+
+```css
+/* Overlay-Transparenz ändern (0.0 = transparent, 1.0 = vollständig undurchsichtig) */
+body::after {
+    background: rgba(0, 0, 0, 0.7); /* 70% Dunkelheit */
+}
 ```
 
-#### 2. Docker Compose starten
-```bash
-cd backend
-docker compose up -d
+### GIF-Darstellung anpassen
+
+```css
+body::before {
+    background-size: cover;     /* Vollständige Abdeckung */
+    background-size: contain;   /* Vollständiges GIF sichtbar */
+    background-size: 50%;       /* Feste Größe */
+    
+    background-position: center;     /* Zentriert */
+    background-position: top left;   /* Links oben */
+    
+    background-repeat: no-repeat;    /* Nicht wiederholen */
+    background-repeat: repeat;       /* Kacheln */
+}
 ```
 
-#### 3. Zugriff
-- **Landing Page**: http://localhost:8080
-- **Netzwerk Editor**: http://localhost:8080/feature.html
-- **n8n Admin**: Klicke auf "Admin Bereich" oder navigiere direkt zu http://localhost:8080/n8n/
+## 🐳 Docker Commands
 
-#### 4. Container stoppen
+### Container verwalten
 ```bash
+# Stoppen
 docker compose down
-```
 
-## 🔌 Netzwerk-Topologie Editor - Bedienung
-
-Der interaktive Netzwerk-Editor ist über die Navigation erreichbar: **🔌 Netzwerk Editor**
-
-### Grundfunktionen
-1. **Gerät hinzufügen**: Klicke auf ein Gerät in der Palette (links)
-   - 💻 PC (türkis)
-   - 🖥️ Server (neongrün)
-   - 🔀 Switch (gelb)
-   - 📡 Router (magenta)
-
-2. **Geräte verschieben**: Ziehe Geräte mit der Maus auf der Arbeitsfläche
-
-3. **Geräte verbinden**:
-   - Klicke auf das erste Gerät mit **gedrückter Shift-Taste**
-   - Das Gerät wird rot markiert
-   - Klicke auf das zweite Gerät (ebenfalls mit Shift)
-   - Eine animierte Verbindungslinie erscheint
-
-4. **Gerät beschriften**: Doppelklicke auf ein Gerät und gib einen Namen ein
-
-5. **Als PNG exportieren**: Klicke auf "Als PNG exportieren" in der oberen Leiste
-   - Die Datei `netzwerk-topologie.png` wird heruntergeladen
-
-6. **Zurücksetzen**: Klicke auf "Leeren" um alle Geräte zu entfernen
-
-### Beispiel-Topologie
-
-Beim Start wird automatisch eine Beispiel-Netzwerktopologie geladen:
-
-```
-        [Router]
-         /    \
-    [Switch]  [Switch]
-      /  |        |
-   [PC][PC]  [Server]
-```
-
-### Screenshots
-
-![Netzwerk-Topologie Editor](https://via.placeholder.com/800x450/0f0f1e/39ff14?text=Netzwerk-Topologie+Editor)
-
-*Hinweis: Screenshot-Pfad kann später mit echtem Bild ersetzt werden*
-
-## 🔧 Docker Management
-
-### Services neustarten
-```bash
-cd backend
+# Neustarten
 docker compose restart
+
+# Logs anzeigen
+docker compose logs -f
+
+# Status prüfen
+docker compose ps
 ```
 
-### Logs anzeigen
+### Troubleshooting
+
+#### Port bereits belegt
+```bash
+# Prüfe welcher Prozess Port 8080 nutzt
+lsof -i :8080  # macOS/Linux
+netstat -ano | findstr :8080  # Windows
+
+# Ändere Port in docker-compose.yml
+ports:
+  - "8081:80"  # Nutze Port 8081 statt 8080
+```
+
+#### Container Logs prüfen
 ```bash
 # Alle Services
 docker compose logs -f
-
 # Nur nginx
 docker compose logs -f nginx
-
 # Nur n8n
 docker compose logs -f n8n
 ```
@@ -162,7 +196,6 @@ docker compose ps
 ## 🎯 n8n AI Starter Kit Setup
 
 Nach dem ersten Start:
-
 1. Öffne http://localhost:8080 und klicke auf "Open n8n"
 2. Erstelle einen Admin-Account in n8n
 3. Gehe zu **Settings** → **Community Nodes**
@@ -179,23 +212,18 @@ Nach dem ersten Start:
 ⚠️ **Wichtig**: Dieses Setup ist für lokale Entwicklung optimiert!
 
 Für Production:
-
 1. **Ändere alle Passwörter** in `docker-compose.yml`:
    ```yaml
    POSTGRES_PASSWORD=STRONG_PASSWORD_HERE
    ```
-
 2. **Aktiviere HTTPS** (z.B. mit Caddy oder Let's Encrypt)
-
 3. **Setze N8N_BASIC_AUTH**:
    ```yaml
    - N8N_BASIC_AUTH_ACTIVE=true
    - N8N_BASIC_AUTH_USER=admin
    - N8N_BASIC_AUTH_PASSWORD=SECURE_PASSWORD
    ```
-
 4. **Nutze externe Datenbank** statt lokaler Postgres
-
 5. **Backup-Strategie** für Docker Volumes
 
 ## 🤝 Contributing
@@ -213,7 +241,7 @@ MIT License - siehe Details im Repository
 - [Docker](https://docker.com) - Containerization
 - [Qdrant](https://qdrant.tech) - Vector Database für AI
 - [Konva.js](https://konvajs.org) - Canvas-Bibliothek für Netzwerk-Editor
+- [Giphy](https://giphy.com) - GIF-Hintergrund Quelle
 
 ---
-
 **Viel Erfolg mit deinem n8n AI Starter Kit! 🚀**
