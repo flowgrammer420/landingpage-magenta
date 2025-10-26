@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   nginx:
     image: nginx:alpine
@@ -30,8 +29,9 @@ services:
       - N8N_EDITOR_BASE_URL=http://localhost:8080/n8n/
       - N8N_METRICS=true
       - GENERIC_TIMEZONE=Europe/Berlin
+      - OLLAMA_HOST=ollama:11434
     volumes:
-      - n8n-data:/home/node/.n8n
+      - n8n_storage:/home/node/.n8n
     restart: unless-stopped
     networks:
       - demo
@@ -45,7 +45,7 @@ services:
       - POSTGRES_USER=n8n
       - POSTGRES_PASSWORD=n8n_password_change_me
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres_storage:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
       - demo
@@ -57,17 +57,44 @@ services:
     ports:
       - "6333:6333"  # Qdrant API
     volumes:
-      - qdrant-data:/qdrant/storage
+      - qdrant_storage:/qdrant/storage
     restart: unless-stopped
     networks:
       - demo
 
+  # Ollama for local LLM inference
+  ollama:
+    image: ollama/ollama:latest
+    container_name: landingpage-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_storage:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - demo
+
+  # One-shot init container to pull the llama model at startup
+  ollama-pull-llama:
+    image: ollama/ollama:latest
+    container_name: landingpage-ollama-pull
+    depends_on:
+      - ollama
+    restart: "no"
+    entrypoint: ["/bin/sh","-c","sleep 3 && ollama pull llama3.1"]
+    networks:
+      - demo
+    volumes:
+      - ollama_storage:/root/.ollama
+
 volumes:
-  n8n-data:
+  n8n_storage:
     driver: local
-  postgres-data:
+  postgres_storage:
     driver: local
-  qdrant-data:
+  qdrant_storage:
+    driver: local
+  ollama_storage:
     driver: local
 
 networks:
