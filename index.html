@@ -41,7 +41,6 @@
             background: transparent;
             position: relative;
         }
-
         /* Responsive Navigation Menu Styles */
         nav {
             display: flex;
@@ -53,7 +52,6 @@
             background: rgba(0, 0, 0, 0.8);
             border-bottom: 2px solid #39ff14;
         }
-
         nav a {
             color: #39ff14;
             text-decoration: none;
@@ -64,13 +62,11 @@
             font-size: 16px;
             white-space: nowrap;
         }
-
         nav a:hover {
             background: #39ff14;
             color: #000;
             box-shadow: 0 0 15px #39ff14;
         }
-
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             nav {
@@ -85,7 +81,6 @@
                 font-size: 14px;
             }
         }
-
         @media (max-width: 480px) {
             nav a {
                 padding: 8px 15px;
@@ -95,24 +90,27 @@
     </style>
 </head>
 <body>
+    <!-- Navigation Placeholder -->
+    <div id="nav-placeholder"></div>
+    <script>
+        fetch('assets/nav.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('nav-placeholder').innerHTML = data;
+            });
+    </script>
+
     <!-- Flip Container -->
     <div class="flip-container" id="flip-container">
         <!-- Front Side (Landing Page) -->
         <div class="flip-box-front">
             <!-- Theme Toggle Switch -->
             <div class="theme-toggle-wrapper">
-                <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle dark/light mode">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light mode">
                     <span class="toggle-icon">☀️</span>
                     <span class="toggle-text">Light Mode</span>
                 </button>
             </div>
-            
-            <!-- Navigation Menu -->
-            <nav>
-                <a href="index.html">Home</a>
-                <a href="feature.html">🔌 Netzwerk Editor</a>
-                <a href="/n8n/" target="_blank">Admin Bereich</a>
-            </nav>
             
             <div class="container">
                 <h1>n8n Landing</h1>
@@ -133,13 +131,14 @@
         <!-- Back Side (n8n iframe) -->
         <div class="flip-box-back">
             <div class="back-header">
-                <button class="back-button" id="back-button" aria-label="Zurück zur Landingpage">
+                <button id="back-button" class="back-button" aria-label="Zurück zur Landingpage">
                     ← Zurück
                 </button>
                 <h2>n8n Admin Panel</h2>
             </div>
             <div class="iframe-container">
-                <iframe src="/n8n/" 
+                <iframe 
+                        src="/n8n/" 
                         title="n8n Workflow Automation" 
                         id="n8n-iframe"
                         frameborder="0" 
