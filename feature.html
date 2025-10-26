@@ -7,10 +7,38 @@
   <link rel="stylesheet" href="assets/css/style.css" />
   <style>
     /* Animated GIF Background */
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://media.giphy.com/media/eg95n5O5SsQ1V4qhsW/giphy.gif'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; z-index: -2; }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://media.giphy.com/media/eg95n5O5SsQ1V4qhsW/giphy.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      z-index: -2;
+    }
+    
     /* Dark overlay for better contrast */
-    body::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: -1; }
-    body { background: transparent; position: relative; }
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: -1;
+    }
+    
+    body {
+      background: transparent;
+      position: relative;
+    }
+
     /* Responsive Navigation Menu Styles */
     nav {
         display: flex;
@@ -22,6 +50,7 @@
         background: rgba(0, 0, 0, 0.8);
         border-bottom: 2px solid #39ff14;
     }
+    
     nav a {
         color: #39ff14;
         text-decoration: none;
@@ -32,11 +61,13 @@
         font-size: 16px;
         white-space: nowrap;
     }
+    
     nav a:hover {
         background: #39ff14;
         color: #000;
         box-shadow: 0 0 15px #39ff14;
     }
+    
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         nav {
@@ -48,171 +79,194 @@
         nav a {
             width: 90%;
             text-align: center;
-            font-size: 14px;
         }
     }
-    @media (max-width: 480px) {
-        nav a {
-            padding: 8px 15px;
-            font-size: 13px;
-        }
+
+    body { margin: 0; overflow: hidden; }
+    #canvas { display: block; }
+    #device-palette {
+      position: fixed;
+      top: 80px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid #39ff14;
+      z-index: 10;
     }
-    .topology-container { display:flex; flex-direction:column; min-height:100vh; background:transparent; }
-    .topology-header { padding:20px; background: rgba(0,0,0,0.5); border-bottom:2px solid #39ff14; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-    .topology-header h1 { color:#39ff14; text-shadow:0 0 20px #39ff14; margin:0; font-size:1.8rem; }
-    .topology-controls { display:flex; gap:10px; flex-wrap:wrap; }
-    .topology-btn { background: linear-gradient(135deg,#39ff14 0%,#00ff88 100%); border:none; padding:10px 20px; border-radius:5px; color:#000; cursor:pointer; }
-    .hint { color:#ccc; font-size:0.9rem; }
-    /* Optional CSS glow if connections are rendered as SVG/Canvas mirror */
-    .neon-connection { stroke:#39ff14; filter: drop-shadow(0 0 6px #39ff14) drop-shadow(0 0 12px #39ff14); }
+    #device-palette h2 {
+      margin: 0 0 10px 0;
+      color: #39ff14;
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px #39ff14;
+    }
+    .device-btn {
+      display: block;
+      margin: 8px 0;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, #39ff14 0%, #00ff88 100%);
+      border: none;
+      border-radius: 4px;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .device-btn:hover {
+      transform: translateX(5px);
+      box-shadow: 0 0 15px #39ff14;
+    }
   </style>
 </head>
 <body>
-  <!-- Embedded Navigation Menu -->
+  <!-- Responsive Navigation Menu -->
   <nav>
     <a href="index.html">Home</a>
-    <a href="feature.html">🔌 Netzwerk Editor</a>
-    <a href="/n8n/" target="_blank">Admin Bereich</a>
+    <a href="feature.html">Netzwerkeditor</a>
+    <a href="/n8n/">n8n</a>
+    <a href="index.html#contact">Kontakt</a>
   </nav>
 
-  <div class="topology-container">
-    <div class="topology-header">
-      <h1>🔌 Netzwerk-Topologie Editor</h1>
-      <div class="topology-controls">
-        <button class="topology-btn" onclick="addNode()">+ Add Node</button>
-        <button class="topology-btn" onclick="clearNodes()">Clear All</button>
-        <button class="topology-btn" onclick="saveTopology()">Save Topology</button>
-        <button class="topology-btn" onclick="loadTopology()">Load Topology</button>
-      </div>
-    </div>
-    <div class="hint">Linksklick auf einen Node, dann Linksklick auf einen anderen Node: Beide werden verbunden (Neon-Linie).</div>
-    <div id="cy" style="width:100%; height:calc(100vh - 180px);"></div>
+  <!-- Device Palette -->
+  <div id="device-palette">
+    <h2>🔌 Gerätepalette</h2>
+    <button class="device-btn" onclick="addDevice('router')">📡 Router</button>
+    <button class="device-btn" onclick="addDevice('switch')">🔀 Switch</button>
+    <button class="device-btn" onclick="addDevice('server')">💻 Server</button>
+    <button class="device-btn" onclick="addDevice('pc')">🖥️ PC</button>
+    <button class="device-btn" onclick="addDevice('firewall')">🔥 Firewall</button>
   </div>
 
-  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+  <div id="stage-container"></div>
+
+  <script src="https://unpkg.com/konva@9/konva.min.js"></script>
   <script>
-    let cy;
-    let nodeCounter = 1;
-    let firstSelected = null;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      cy = cytoscape({
-        container: document.getElementById('cy'),
-        style: [
-          {
-            selector: 'node',
-            style: {
-              'label': 'data(id)',
-              'text-valign': 'center',
-              'color': '#39ff14',
-              'background-color': '#000',
-              'border-width': 3,
-              'border-color': '#39ff14',
-              'width': 50,
-              'height': 50,
-              'font-size': 14,
-              'text-outline-width': 2,
-              'text-outline-color': '#000'
-            }
-          },
-          {
-            selector: 'edge',
-            style: {
-              'width': 4,
-              'line-color': '#39ff14',
-              'target-arrow-color': '#39ff14',
-              'target-arrow-shape': 'triangle',
-              'curve-style': 'bezier',
-              'opacity': 0.9
-            }
-          },
-          {
-            selector: 'node:selected',
-            style: {
-              'border-color': '#00ff88',
-              'border-width': 5
-            }
-          }
-        ],
-        layout: { name: 'preset' }
-      });
-
-      cy.on('tap', 'node', function(evt) {
-        const node = evt.target;
-        if (!firstSelected) {
-          firstSelected = node;
-          node.style('border-color', '#00ff88');
-        } else {
-          if (firstSelected.id() !== node.id()) {
-            cy.add({
-              group: 'edges',
-              data: {
-                source: firstSelected.id(),
-                target: node.id()
-              }
-            });
-          }
-          firstSelected.style('border-color', '#39ff14');
-          firstSelected = null;
-        }
-      });
-
-      cy.on('tap', function(evt) {
-        if (evt.target === cy) {
-          if (firstSelected) {
-            firstSelected.style('border-color', '#39ff14');
-            firstSelected = null;
-          }
-        }
-      });
+    const stage = new Konva.Stage({
+      container: 'stage-container',
+      width: width,
+      height: height
     });
 
-    function addNode() {
-      const nodeId = 'node' + nodeCounter++;
-      cy.add({
-        group: 'nodes',
-        data: { id: nodeId },
-        position: { x: Math.random() * 600 + 100, y: Math.random() * 400 + 100 }
-      });
-    }
+    const layer = new Konva.Layer();
+    stage.add(layer);
 
-    function clearNodes() {
-      cy.elements().remove();
-      firstSelected = null;
-      nodeCounter = 1;
-    }
+    const devices = [];
+    let selectedDevice = null;
 
-    function saveTopology() {
-      const json = cy.json();
-      const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'topology.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function loadTopology() {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'application/json';
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const json = JSON.parse(event.target.result);
-            cy.json(json);
-          } catch (err) {
-            alert('Invalid topology file');
-          }
-        };
-        reader.readAsText(file);
+    function addDevice(type) {
+      const symbols = {
+        router: '📡',
+        switch: '🔀',
+        server: '💻',
+        pc: '🖥️',
+        firewall: '🔥'
       };
-      input.click();
+
+      const group = new Konva.Group({
+        x: Math.random() * (width - 200) + 100,
+        y: Math.random() * (height - 200) + 100,
+        draggable: true
+      });
+
+      const rect = new Konva.Rect({
+        width: 120,
+        height: 80,
+        fill: 'rgba(57, 255, 20, 0.2)',
+        stroke: '#39ff14',
+        strokeWidth: 2,
+        cornerRadius: 8,
+        shadowColor: '#39ff14',
+        shadowBlur: 15,
+        shadowOpacity: 0.8
+      });
+
+      const text = new Konva.Text({
+        text: symbols[type] + '\n' + type.toUpperCase(),
+        fontSize: 20,
+        fontFamily: 'Arial',
+        fill: '#39ff14',
+        width: 120,
+        padding: 10,
+        align: 'center'
+      });
+
+      group.add(rect);
+      group.add(text);
+      layer.add(group);
+
+      group.on('click tap', function() {
+        if (selectedDevice === null) {
+          selectedDevice = group;
+          rect.stroke('#00ff88');
+          rect.strokeWidth(4);
+          layer.draw();
+        } else if (selectedDevice !== group) {
+          drawConnection(selectedDevice, group);
+          const firstRect = selectedDevice.findOne('Rect');
+          firstRect.stroke('#39ff14');
+          firstRect.strokeWidth(2);
+          selectedDevice = null;
+          layer.draw();
+        } else {
+          rect.stroke('#39ff14');
+          rect.strokeWidth(2);
+          selectedDevice = null;
+          layer.draw();
+        }
+      });
+
+      devices.push(group);
+      layer.draw();
     }
+
+    function drawConnection(device1, device2) {
+      const pos1 = device1.position();
+      const pos2 = device2.position();
+
+      const line = new Konva.Line({
+        points: [
+          pos1.x + 60, pos1.y + 40,
+          pos2.x + 60, pos2.y + 40
+        ],
+        stroke: '#39ff14',
+        strokeWidth: 2,
+        shadowColor: '#39ff14',
+        shadowBlur: 10,
+        shadowOpacity: 0.8
+      });
+
+      layer.add(line);
+      line.moveToBottom();
+      layer.draw();
+
+      device1.on('dragmove', updateLines);
+      device2.on('dragmove', updateLines);
+
+      function updateLines() {
+        const newPos1 = device1.position();
+        const newPos2 = device2.position();
+        line.points([
+          newPos1.x + 60, newPos1.y + 40,
+          newPos2.x + 60, newPos2.y + 40
+        ]);
+        layer.draw();
+      }
+    }
+
+    stage.on('click tap', function(e) {
+      if (e.target === stage) {
+        if (selectedDevice) {
+          const rect = selectedDevice.findOne('Rect');
+          rect.stroke('#39ff14');
+          rect.strokeWidth(2);
+          selectedDevice = null;
+          layer.draw();
+        }
+      }
+    });
   </script>
 </body>
 </html>
