@@ -22,7 +22,6 @@
       background: rgba(0,0,0,0.7); z-index: -1;
     }
     body { background: transparent; position: relative; }
-
     /* Responsive Navigation Menu Styles */
     nav {
         display: flex;
@@ -34,7 +33,6 @@
         background: rgba(0, 0, 0, 0.8);
         border-bottom: 2px solid #39ff14;
     }
-
     nav a {
         color: #39ff14;
         text-decoration: none;
@@ -45,13 +43,11 @@
         font-size: 16px;
         white-space: nowrap;
     }
-
     nav a:hover {
         background: #39ff14;
         color: #000;
         box-shadow: 0 0 15px #39ff14;
     }
-
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         nav {
@@ -66,14 +62,12 @@
             font-size: 14px;
         }
     }
-
     @media (max-width: 480px) {
         nav a {
             padding: 8px 15px;
             font-size: 13px;
         }
     }
-
     .topology-container { display:flex; flex-direction:column; min-height:100vh; background:transparent; }
     .topology-header { padding:20px; background: rgba(0,0,0,0.5); border-bottom:2px solid #39ff14; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
     .topology-header h1 { color:#39ff14; text-shadow:0 0 20px #39ff14; margin:0; font-size:1.8rem; }
@@ -86,12 +80,15 @@
   <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 </head>
 <body>
-  <!-- Navigation Menu -->
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="feature.html">🔌 Netzwerk Editor</a>
-    <a href="/n8n/" target="_blank">Admin Bereich</a>
-  </nav>
+  <!-- Navigation Placeholder -->
+  <div id="nav-placeholder"></div>
+  <script>
+    fetch('assets/nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('nav-placeholder').innerHTML = data;
+      });
+  </script>
 
   <div class="topology-container">
     <header class="topology-header">
